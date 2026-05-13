@@ -23,23 +23,21 @@ const PagePrList = ({ ctx }) => {
   return (
     <div className="col gap-20">
       <div className="pillow p-24">
-        <div className="between wrap">
-          <div>
-            <div className="t-28 text-1">My pull requests</div>
+        <div className="between wrap gap-20" style={{ alignItems: 'flex-start' }}>
+          <div style={{ flex: 1, minWidth: 320 }}>
+            <div className="row gap-10 wrap" style={{ alignItems: 'center' }}>
+              <div className="t-28 text-1">My pull requests</div>
+              <button className="btn btn-pillow btn-sm"><Icon name="external" className="ic ic-sm" /> Open in GitHub</button>
+            </div>
             <div className="t-14 text-2 mt-6" style={{ maxWidth: 640 }}>
               Run a readiness check before you request human review. Higher readiness scores get approvals faster.
             </div>
           </div>
-          <div className="row gap-10 wrap">
-            <button className="btn btn-pillow btn-sm"><Icon name="external" className="ic ic-sm" /> Open in GitHub</button>
+          <div className="row gap-10 wrap" style={{ justifyContent: 'flex-end' }}>
+            <QuickStat label="Open PRs"      value={stats.open} />
+            <QuickStat label="Need attention" value={stats.needAttn} tone={stats.needAttn ? 'warn' : 'good'} />
+            <QuickStat label="Avg readiness" value={`${stats.avg}/100`} tone={stats.avg >= 85 ? 'good' : stats.avg >= 70 ? 'warn' : 'risk'} />
           </div>
-        </div>
-
-        {/* Quick stats */}
-        <div className="row gap-10 mt-20 wrap">
-          <QuickStat label="Open PRs"      value={stats.open} />
-          <QuickStat label="Need attention" value={stats.needAttn} tone={stats.needAttn ? 'warn' : 'good'} />
-          <QuickStat label="Avg readiness" value={`${stats.avg}/100`} tone={stats.avg >= 85 ? 'good' : stats.avg >= 70 ? 'warn' : 'risk'} />
         </div>
       </div>
 

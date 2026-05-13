@@ -135,7 +135,7 @@ function SuggestionBlock({ s, action, readOnly, onAct, onDecline, focused, onHov
       )}
 
       {!readOnly && !status && (
-        <div className="row gap-6 mt-10" style={{ justifyContent: 'flex-end' }}>
+        <div className="row gap-6 mt-20" style={{ justifyContent: 'flex-end' }}>
           <button className="btn btn-ghost-dark btn-xs" onClick={() => onAct(s, 'accepted')}>
             <Icon name="check" className="ic ic-sm" /> Accept
           </button>
@@ -346,8 +346,8 @@ const PageReview = ({ ctx, prId }) => {
         </div>
       </div>
 
-      {/* 50/50 split */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, alignItems: 'flex-start' }}>
+      {/* 50/50 split — both panels stretch to the height of the taller */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, alignItems: 'stretch' }}>
         {/* LEFT — code + file switcher */}
         <div className="pillow p-16" style={{ minWidth: 0 }}>
           {/* file tabs */}

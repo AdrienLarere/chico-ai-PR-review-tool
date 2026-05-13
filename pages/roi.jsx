@@ -26,16 +26,9 @@ const PageROI = ({ ctx }) => {
 
   return (
     <div className="col gap-20">
-      {/* Header — no filters */}
-      <div className="pillow p-24">
-        <div className="t-28 text-1">AI Adoption → Delivery Impact</div>
-        <div className="t-14 text-2 mt-6" style={{ maxWidth: 720 }}>
-          Compare AI readiness adoption with delivery outcomes across engineering teams.
-        </div>
-      </div>
-
       {/* 3-graph carousel */}
-      <div className="pillow p-20">
+      <div className="pillow p-24">
+        <div className="t-28 text-1 mb-16">Team Comparison</div>
         <div className="between wrap mb-12">
           <div>
             <div className="row gap-8">
@@ -80,7 +73,7 @@ const PageROI = ({ ctx }) => {
 
       {/* Comparison table */}
       <div className="pillow p-20">
-        <div className="t-20 text-1 mb-12">Team comparison</div>
+        <div className="t-20 text-1 mb-12">Comparison Table</div>
         <table className="tbl">
           <thead>
             <tr>
@@ -126,15 +119,16 @@ function BrkLite({ k, v }) {
 
 // =============== Graph 1: scatter ===============
 function ScatterGraph() {
-  const W = 1080, H = 320, PAD = { l: 64, r: 32, t: 18, b: 44 };
+  const W = 1080, H = 320, PAD = { l: 64, r: 32, t: 36, b: 44 };
+  const yMax = 36;
   const xs = (v) => PAD.l + (v / 100) * (W - PAD.l - PAD.r);
-  const ys = (v) => H - PAD.b - (v / 30) * (H - PAD.t - PAD.b);
-  const trend = [{ x: 8, y: 28 }, { x: 92, y: 8 }];
+  const ys = (v) => H - PAD.b - (v / yMax) * (H - PAD.t - PAD.b);
+  const trend = [{ x: 8, y: 32 }, { x: 92, y: 8 }];
 
   return (
     <div className="pillow-inset" style={{ padding: 12, borderRadius: 16 }}>
       <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
-        {[0, 10, 20, 30].map(y => (
+        {[0, 12, 24, 36].map(y => (
           <g key={y}>
             <line x1={PAD.l} x2={W - PAD.r} y1={ys(y)} y2={ys(y)} stroke="rgba(200,194,217,0.4)" strokeDasharray="2 4" />
             <text x={PAD.l - 8} y={ys(y) + 4} textAnchor="end" fontSize="11" fill="var(--text-3)">{y}h</text>
@@ -149,7 +143,8 @@ function ScatterGraph() {
         {window.TEAMS.map(t => {
           const color = window.TEAM_HISTORY[t.id].color;
           return (
-            <g key={t.id}>
+            <g key={t.id} style={{ cursor: 'pointer' }}>
+              <title>{`${t.name} — ${t.usage}% AI readiness usage, ${t.approvalH}h median approval`}</title>
               <circle cx={xs(t.usage)} cy={ys(t.approvalH)} r={14} fill={color} opacity="0.18" />
               <circle cx={xs(t.usage)} cy={ys(t.approvalH)} r={8} fill={color} />
               <text x={xs(t.usage)} y={ys(t.approvalH) - 16} textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--text-1)">{t.name}</text>
@@ -196,9 +191,11 @@ function TimeGraph({ series, yLabel, yMin, yMax, ySuffix }) {
             <g key={t.id}>
               <path d={path} stroke={color} strokeWidth={2.5} fill="none" strokeLinecap="round" strokeLinejoin="round" />
               {data.map((v, i) => (
-                <g key={i}>
-                  <circle cx={xs(i)} cy={ys(v)} r={4.5} fill={color} />
+                <g key={i} style={{ cursor: 'pointer' }}>
+                  <title>{`${t.name} · ${labels[i]} — ${v}${ySuffix}`}</title>
                   <circle cx={xs(i)} cy={ys(v)} r={8} fill={color} opacity={0.15} />
+                  <circle cx={xs(i)} cy={ys(v)} r={4.5} fill={color} />
+                  <circle cx={xs(i)} cy={ys(v)} r={14} fill="transparent" />
                 </g>
               ))}
               <text x={xs(data.length - 1) + 8} y={ys(data[data.length - 1]) + 4} fontSize="11" fontWeight="600" fill={color}>{t.name}</text>

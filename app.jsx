@@ -2,6 +2,23 @@
 
 const { useState, useEffect, useRef, useMemo, useCallback } = React;
 
+// =============== Blog post catalog ===============
+const BLOG_POSTS = [
+  { slug: 'presentation', short: 'Presentation', sub: 'About this app' },
+  { slug: 'meta',         short: 'Meta',         sub: 'The engine, not the app' },
+  { slug: 'expanding',    short: 'Expanding',    sub: 'Readiness beyond PRs' },
+];
+const VALID_SLUGS = BLOG_POSTS.map(p => p.slug);
+const DEFAULT_BLOG_SLUG = 'presentation';
+const BLOG_POSTS_BY_SLUG = Object.fromEntries(BLOG_POSTS.map(p => [p.slug, p]));
+
+function parseBlogPath(pathname) {
+  // Returns slug if pathname is /blog/<known-slug>, else null
+  const m = pathname.match(/^\/blog\/([^/]+)\/?$/);
+  if (m && VALID_SLUGS.includes(m[1])) return m[1];
+  return null;
+}
+
 // =============== Toast Stack ===============
 function ToastStack({ toasts, dismiss }) {
   return (
@@ -40,18 +57,37 @@ const TABS = {
 };
 
 // =============== Top Bar ===============
-function TopBar({ user, switchUser, page, setPage }) {
+const FROSTED_AVATAR = {
+  background: 'rgba(26, 22, 38, 0.72)',
+  backdropFilter: 'blur(10px) saturate(160%)',
+  WebkitBackdropFilter: 'blur(10px) saturate(160%)',
+  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 2px 6px -2px rgba(26,22,38,0.45)',
+};
+
+function TopBar({ user, switchUser, page, setPage, blogSlug, goToBlog }) {
   const [open, setOpen] = useState(false);
+  const [brandOpen, setBrandOpen] = useState(false);
+  const [postOpen, setPostOpen] = useState(false);
   const tabs = TABS[user.role];
   const ref = useRef(null);
+  const brandRef = useRef(null);
+  const postRef = useRef(null);
 
   // When viewing a PR detail, keep the parent list tab highlighted
   const activeTab = page === 'prdetail'
     ? (user.role === 'manager' ? 'queue' : 'prlist')
     : page;
 
+  // Blog pages are their own surface — no tabs, no user pill
+  const isBlog = page === 'blog';
+  const currentPost = BLOG_POSTS_BY_SLUG[blogSlug] || BLOG_POSTS_BY_SLUG[DEFAULT_BLOG_SLUG];
+
   useEffect(() => {
-    function onDoc(e) { if (ref.current && !ref.current.contains(e.target)) setOpen(false); }
+    function onDoc(e) {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+      if (brandRef.current && !brandRef.current.contains(e.target)) setBrandOpen(false);
+      if (postRef.current && !postRef.current.contains(e.target)) setPostOpen(false);
+    }
     document.addEventListener('mousedown', onDoc);
     return () => document.removeEventListener('mousedown', onDoc);
   }, []);
@@ -60,38 +96,142 @@ function TopBar({ user, switchUser, page, setPage }) {
     <div className="topbar-bar">
       <div className="topbar-inner">
         <div className="row gap-16" style={{ alignItems: 'center' }}>
-        <div className="row gap-10">
-          <div className="row center" style={{
-            width: 34, height: 34, borderRadius: 11,
-            background: 'rgba(26,22,38,0.92)', color: '#B5B5FF',
-            boxShadow: '0 6px 14px -4px rgba(26,22,38,0.4), inset 0 1px 0 rgba(255,255,255,0.08)',
-          }}>
-            <Icon name="monogram" className="ic" />
-          </div>
-          <div>
-            <div className="t-14 w-600 text-1" style={{ lineHeight: 1.1 }}>Chico</div>
-            <div className="t-12 text-3" style={{ lineHeight: 1.1 }}>PR Readiness</div>
-          </div>
+        <div ref={brandRef} style={{ position: 'relative' }}>
+          <button
+            className="brand-button"
+            onClick={() => setBrandOpen(o => !o)}
+            aria-haspopup="menu"
+            aria-expanded={brandOpen}
+          >
+            <img src="assets/chico-bear.png" alt="chico.ai" className="chico-bear" style={{ width: 40, height: 40, display: 'block' }} />
+            <div>
+              <div className="t-14 w-600 text-1" style={{ lineHeight: 1.1 }}>chico.ai</div>
+              <div className="t-12 text-3" style={{ lineHeight: 1.1 }}>{isBlog ? 'Blog' : 'PR Readiness'}</div>
+            </div>
+          </button>
+
+          {brandOpen && (
+            <div className="brand-menu bounce-in" style={{
+              position: 'absolute', top: 'calc(100% + 8px)', left: 0,
+              minWidth: 260, padding: 10, zIndex: 50,
+            }}>
+              <div className="t-12 glass-text-3 uppercase" style={{ padding: '6px 10px 8px' }}>Go to</div>
+              <button
+                className="user-menu-item"
+                onClick={() => {
+                  if (isBlog) setPage(user.role === 'manager' ? 'dashboard' : 'prlist');
+                  setBrandOpen(false);
+                }}
+              >
+                <div className="row center" style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(107,107,255,0.18)', color: '#6B6BFF' }}>
+                  <Icon name="queue" className="ic ic-sm" />
+                </div>
+                <div style={{ textAlign: 'left', flex: 1 }}>
+                  <div className="t-14 w-500 glass-text-1" style={{ lineHeight: 1.15 }}>PR Review</div>
+                  <div className="t-12 glass-text-3">The app</div>
+                </div>
+                {!isBlog && (
+                  <span className="pill pill-good"><Icon name="check" className="ic ic-sm" /></span>
+                )}
+              </button>
+              <button
+                className="user-menu-item"
+                onClick={() => {
+                  if (!isBlog) setPage('blog');
+                  setBrandOpen(false);
+                }}
+              >
+                <div className="row center" style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(107,107,255,0.18)', color: '#6B6BFF' }}>
+                  <Icon name="book" className="ic ic-sm" />
+                </div>
+                <div style={{ textAlign: 'left', flex: 1 }}>
+                  <div className="t-14 w-500 glass-text-1" style={{ lineHeight: 1.15 }}>Blog</div>
+                  <div className="t-12 glass-text-3">Behind the prototype</div>
+                </div>
+                {isBlog && (
+                  <span className="pill pill-good"><Icon name="check" className="ic ic-sm" /></span>
+                )}
+              </button>
+            </div>
+          )}
         </div>
 
-        <div style={{ width: 1, height: 26, background: 'rgba(200,194,217,0.4)' }}></div>
+        {!isBlog && (
+          <div style={{ width: 1, height: 26, background: 'rgba(200,194,217,0.4)' }}></div>
+        )}
 
         {/* Horizontal tabs */}
-        <nav className="row gap-6" style={{ alignItems: 'center' }}>
-          {tabs.map(t => (
-            <button
-              key={t.id}
-              className={`top-tab ${activeTab === t.id ? 'active' : ''}`}
-              onClick={() => setPage(t.id)}
-            >
-              <Icon name={t.icon} className="ic ic-sm" />
-              <span>{t.label}</span>
-            </button>
-          ))}
-        </nav>
+        {!isBlog && (
+          <nav className="row gap-6" style={{ alignItems: 'center' }}>
+            {tabs.map(t => (
+              <button
+                key={t.id}
+                className={`top-tab ${activeTab === t.id ? 'active' : ''}`}
+                onClick={() => setPage(t.id)}
+              >
+                <Icon name={t.icon} className="ic ic-sm" />
+                <span>{t.label}</span>
+              </button>
+            ))}
+          </nav>
+        )}
 
         <div style={{ marginLeft: 'auto' }} className="row gap-10">
+          {/* Blog post pill — when on blog, replaces the user pill */}
+          {isBlog && (
+            <div ref={postRef} style={{ position: 'relative' }}>
+              <button
+                className="user-pill"
+                onClick={() => setPostOpen(o => !o)}
+                aria-haspopup="menu"
+                aria-expanded={postOpen}
+              >
+                <div className="row center" style={{
+                  width: 30, height: 30, borderRadius: '50%',
+                  background: 'rgba(107,107,255,0.18)', color: '#6B6BFF',
+                }}>
+                  <Icon name="book" className="ic ic-sm" />
+                </div>
+                <div style={{ textAlign: 'left' }}>
+                  <div className="t-12 w-600 text-1" style={{ lineHeight: 1.1 }}>{currentPost.short}</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-3)', lineHeight: 1.1 }}>Blog post</div>
+                </div>
+                <Icon name={postOpen ? 'up' : 'down'} className="ic ic-sm" />
+              </button>
+
+              {postOpen && (
+                <div className="user-menu bounce-in" style={{
+                  position: 'absolute', top: 'calc(100% + 8px)', right: 0,
+                  minWidth: 260, padding: 10, zIndex: 50,
+                }}>
+                  <div className="t-12 glass-text-3 uppercase" style={{ padding: '6px 10px 8px' }}>Switch post</div>
+                  {BLOG_POSTS.map(p => (
+                    <button
+                      key={p.slug}
+                      className="user-menu-item"
+                      onClick={() => {
+                        if (p.slug !== blogSlug) goToBlog(p.slug);
+                        setPostOpen(false);
+                      }}
+                    >
+                      <div className="row center" style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(107,107,255,0.18)', color: '#6B6BFF' }}>
+                        <Icon name="book" className="ic ic-sm" />
+                      </div>
+                      <div style={{ textAlign: 'left', flex: 1 }}>
+                        <div className="t-14 w-500 glass-text-1" style={{ lineHeight: 1.15 }}>{p.short}</div>
+                        <div className="t-12 glass-text-3">{p.sub}</div>
+                      </div>
+                      {p.slug === blogSlug && (
+                        <span className="pill pill-good"><Icon name="check" className="ic ic-sm" /></span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
           {/* User pill — clickable to switch identity */}
+          {!isBlog && (
           <div ref={ref} style={{ position: 'relative' }}>
             <button
               className="user-pill"
@@ -101,8 +241,8 @@ function TopBar({ user, switchUser, page, setPage }) {
             >
               <div className="row center" style={{
                 width: 30, height: 30, borderRadius: '50%',
-                background: '#1A1626',
                 color: 'white', fontSize: 12, fontWeight: 600,
+                ...FROSTED_AVATAR,
               }}>{user.initials}</div>
               <div style={{ textAlign: 'left' }}>
                 <div className="t-12 w-600 text-1" style={{ lineHeight: 1.1 }}>{user.name}</div>
@@ -112,7 +252,7 @@ function TopBar({ user, switchUser, page, setPage }) {
             </button>
 
             {open && (
-              <div className="glass user-menu bounce-in" style={{
+              <div className="user-menu bounce-in" style={{
                 position: 'absolute', top: 'calc(100% + 8px)', right: 0,
                 minWidth: 260, padding: 10, zIndex: 50,
               }}>
@@ -125,8 +265,8 @@ function TopBar({ user, switchUser, page, setPage }) {
                   >
                     <div className="row center" style={{
                       width: 28, height: 28, borderRadius: '50%',
-                      background: '#1A1626',
                       color: 'white', fontSize: 11, fontWeight: 600,
+                      ...FROSTED_AVATAR,
                     }}>{u.initials}</div>
                     <div style={{ textAlign: 'left', flex: 1 }}>
                       <div className="t-14 w-500 glass-text-1" style={{ lineHeight: 1.15 }}>{u.name}</div>
@@ -144,6 +284,7 @@ function TopBar({ user, switchUser, page, setPage }) {
               </div>
             )}
           </div>
+          )}
         </div>
       </div>
     </div>
@@ -151,13 +292,54 @@ function TopBar({ user, switchUser, page, setPage }) {
   );
 }
 function App() {
-  const [userId, setUserId] = useState('maya');
+  // Persisted login — restore userId from localStorage if present and valid
+  const [userId, setUserId] = useState(() => {
+    try {
+      const saved = localStorage.getItem('chico_userId');
+      if (saved && window.USERS[saved]) return saved;
+    } catch (e) { /* ignore */ }
+    return 'maya';
+  });
+  useEffect(() => {
+    try { localStorage.setItem('chico_userId', userId); } catch (e) { /* ignore */ }
+  }, [userId]);
+
   const user = window.USERS[userId];
 
   // Default page per role
   const defaultPage = user.role === 'manager' ? 'dashboard' : 'prlist';
-  const [page, setPage] = useState(defaultPage);
+
+  // Initial page + blog slug derived from URL
+  const initialSlugFromUrl = typeof window !== 'undefined'
+    ? parseBlogPath(window.location.pathname)
+    : null;
+  const [page, setPage] = useState(initialSlugFromUrl ? 'blog' : defaultPage);
+  const [blogSlug, setBlogSlug] = useState(initialSlugFromUrl || DEFAULT_BLOG_SLUG);
   const [currentPrId, setCurrentPrId] = useState(null);
+
+  // Keep the URL in sync with page + blog slug
+  useEffect(() => {
+    const expected = page === 'blog' ? `/blog/${blogSlug}` : '/';
+    if (window.location.pathname !== expected) {
+      window.history.pushState(null, '', expected);
+    }
+  }, [page, blogSlug]);
+
+  // Browser back/forward handling
+  useEffect(() => {
+    function onPop() {
+      const slug = parseBlogPath(window.location.pathname);
+      setCurrentPrId(null);
+      if (slug) {
+        setBlogSlug(slug);
+        setPage('blog');
+      } else {
+        setPage(prev => (prev === 'blog' ? defaultPage : prev));
+      }
+    }
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, [defaultPage]);
 
   const switchUser = useCallback((id) => {
     setUserId(id);
@@ -194,18 +376,25 @@ function App() {
     setPage(target);
   }, [user.role]);
 
-  const ctx = { user, toasts, pushToast, dismiss, pr184, setPr184, navigate, openPR, currentPrId, setCurrentPrId };
+  const goToBlog = useCallback((slug) => {
+    setBlogSlug(slug);
+    setPage('blog');
+    setCurrentPrId(null);
+  }, []);
+
+  const ctx = { user, toasts, pushToast, dismiss, pr184, setPr184, navigate, openPR, currentPrId, setCurrentPrId, blogSlug, goToBlog };
 
   return (
     <div className="app-shell">
-      <TopBar user={user} switchUser={switchUser} page={page} setPage={(p) => { setPage(p); setCurrentPrId(null); }} />
+      <TopBar user={user} switchUser={switchUser} page={page} setPage={(p) => { setPage(p); setCurrentPrId(null); }} blogSlug={blogSlug} goToBlog={goToBlog} />
       <div className="main-wide">
-        <div key={page + (currentPrId || '')} className="page-fade">
+        <div key={page + blogSlug + (currentPrId || '')} className="page-fade">
           {page === 'dashboard' && user.role === 'manager' && <window.PageDashboard ctx={ctx} />}
           {page === 'queue'     && user.role === 'manager' && <window.PageQueue ctx={ctx} />}
           {page === 'prlist'    && user.role === 'developer' && <window.PagePrList ctx={ctx} />}
           {page === 'prdetail'  && <window.PageReview ctx={ctx} prId={currentPrId} />}
           {page === 'roi'       && <window.PageROI ctx={ctx} />}
+          {page === 'blog'      && <window.PageBlog ctx={ctx} slug={blogSlug} />}
         </div>
       </div>
       <ToastStack toasts={toasts} dismiss={dismiss} />

@@ -11,17 +11,20 @@ const PageDashboard = ({ ctx }) => {
     <div className="col gap-20">
       {/* Header — no filters, no big button */}
       <div className="pillow p-24">
-        <div className="t-12 text-3 uppercase mb-4">Payments team · Sprint 24.10</div>
-        <div className="t-28 text-1">How your team is using PR readiness</div>
-        <div className="t-14 text-2 mt-6" style={{ maxWidth: 720 }}>
-          Each engineer's readiness scores and PR approval times over the last six sprints. Some engineers haven't adopted readiness yet — their approval times are essentially flat noise. Use these views to spot who would benefit from a nudge.
-        </div>
-
-        <div className="row gap-10 mt-16 wrap">
-          <SummaryStat label="Team avg readiness" value={teamAvgReadiness} suffix="/100" tone={teamAvgReadiness >= 80 ? 'good' : 'warn'} />
-          <SummaryStat label="Team avg approval" value={teamAvgApproval} suffix="h" tone="good" />
-          <SummaryStat label="PRs this sprint" value={totalPRs} />
-          <SummaryStat label="Suggestions acted on" value={totalActedOn} />
+        <div className="between wrap gap-20" style={{ alignItems: 'flex-start' }}>
+          <div style={{ flex: 1, minWidth: 320 }}>
+            <div className="t-12 text-3 uppercase mb-4">Payments team · Sprint 24.10</div>
+            <div className="t-28 text-1">How your team is using PR readiness</div>
+            <div className="t-14 text-2 mt-6" style={{ maxWidth: 720 }}>
+              Each engineer's readiness scores and PR approval times over the last six sprints. Some engineers haven't adopted readiness yet — their approval times are essentially flat noise. Use these views to spot who would benefit from a nudge.
+            </div>
+          </div>
+          <div className="row gap-10 wrap" style={{ justifyContent: 'flex-end' }}>
+            <SummaryStat label="Team avg readiness" value={teamAvgReadiness} suffix="/100" tone={teamAvgReadiness >= 80 ? 'good' : 'warn'} />
+            <SummaryStat label="Team avg approval" value={teamAvgApproval} suffix="h" tone="good" />
+            <SummaryStat label="PRs this sprint" value={totalPRs} />
+            <SummaryStat label="Suggestions acted on" value={totalActedOn} />
+          </div>
         </div>
       </div>
 
