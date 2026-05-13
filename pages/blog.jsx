@@ -2,15 +2,19 @@
 
 // =============== Post content ===============
 
-function PostPresentation() {
+function PostPresentation({ ctx }) {
+  const openExpanding = (e) => {
+    e.preventDefault();
+    ctx && ctx.goToBlog && ctx.goToBlog('expanding');
+  };
   return (
     <>
-      <h2>The Problem:</h2>
+      <h2>The Problem</h2>
       <p>Chico.ai monitors AI use, but does nothing to improve adoption.</p>
       <p>We want a feature that is narrow enough it can be built fast and quickly validate or dismiss its existence.</p>
       <p>And broad enough that if it works, its theory or model is generalizable.</p>
 
-      <h2>Tensions/Obstacles:</h2>
+      <h2>Tensions/Obstacles</h2>
       <ul>
         <li>
           Multiple stakeholders with different goals; roughly CEOs vs Managers vs Workers
@@ -25,7 +29,7 @@ function PostPresentation() {
         <li>How do you tie ROI to AI usage?</li>
       </ul>
 
-      <h2>Things I want from my system:</h2>
+      <h2>Things I want from my system</h2>
       <ul>
         <li>Integrated into real work, or real systems that people already use</li>
         <li>Involving both managers and workers. Managers because they can both monitor and convince their teams; workers because they are more likely tied to ROI than the managers.</li>
@@ -78,8 +82,12 @@ function PostPresentation() {
 
       <hr />
 
+      <h2>Too narrow?</h2>
       <p>The main counter argument to this feature is it is not representative of our customers, such that it won't scale.</p>
       <p>But engineering is not the whole market, it is easiest measurable process. The general pattern is workflow readiness.</p>
+      <p>
+        <a href="/blog/expanding" onClick={openExpanding} className="prose-link">Read more here</a>
+      </p>
 
       <hr />
 
@@ -261,7 +269,7 @@ const PageBlog = ({ ctx, slug }) => {
       {/* Body card */}
       <div className="pillow" style={{ maxWidth: 1032, width: '100%', padding: '48px 64px' }}>
         <div className="prose" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
-          <Body />
+          <Body ctx={ctx} />
         </div>
       </div>
     </div>

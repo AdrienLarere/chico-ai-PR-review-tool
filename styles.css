@@ -543,6 +543,17 @@ code, pre, .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
 }
 .prose li::marker { color: var(--text-3); }
 .prose strong { color: var(--text-1); font-weight: 600; }
+.prose a,
+.prose-link {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  cursor: pointer;
+  transition: color 160ms ease-out;
+}
+.prose a:hover,
+.prose-link:hover { color: var(--accent-hover); }
 
 
 /* chico bear navbar icon — gentle float */
