@@ -29,7 +29,7 @@ const PageQueue = ({ ctx }) => {
           <div>
             <div className="t-28 text-1">Pull Request Queue</div>
             <div className="t-14 text-2 mt-6" style={{ maxWidth: 640 }}>
-              Prioritize reviews using AI readiness status and team-level risk signals.
+              Prioritize reviews using PR readiness status and team-level risk signals.
             </div>
           </div>
           <div className="row gap-10 wrap">

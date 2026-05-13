@@ -71,7 +71,7 @@ function CodeView({ code, file, suggestions, onSuggestionHover, focusedSugId }) 
   );
 }
 
-function SuggestionBlock({ s, action, readOnly, onAct, onDecline, focused, onHoverLine, cardRef, dim }) {
+function SuggestionBlock({ s, action, readOnly, onAct, onDecline, onUndo, focused, onHoverLine, cardRef, dim }) {
   const sevClass = s.severity === 'High' ? 'pill-risk' : s.severity === 'Medium' ? 'pill-warn' : 'pill-neutral';
   const status = action;
   const stateClass = status === 'accepted' ? 'accepted' : status === 'fixed' ? 'fixed' : status === 'declined' ? 'declined' : '';
@@ -144,6 +144,13 @@ function SuggestionBlock({ s, action, readOnly, onAct, onDecline, focused, onHov
           </button>
           <button className="btn btn-ghost-dark btn-xs" onClick={() => onAct(s, 'fixed')} style={{ color: '#B5B5FF', borderColor: 'rgba(107,107,255,0.34)' }}>
             <Icon name="spark" className="ic ic-sm" /> Mark fixed
+          </button>
+        </div>
+      )}
+      {!readOnly && status && (
+        <div className="row gap-6 mt-20" style={{ justifyContent: 'flex-end' }}>
+          <button className="btn btn-ghost-dark btn-xs" onClick={() => onUndo && onUndo(s)}>
+            <Icon name="refresh" className="ic ic-sm" /> Undo
           </button>
         </div>
       )}
@@ -245,7 +252,11 @@ const PageReview = ({ ctx, prId }) => {
 
     ctx.setPr184(prev => {
       const nextOverrides = { ...(prev.fileOverrides || {}) };
+      // Snapshot for undo: capture pre-action file content (if patched) and the score delta actually applied
+      const snapshot = { scoreDelta: newScore - prev.score };
       if (patch) {
+        snapshot.file = patch.file;
+        snapshot.prevFileContent = nextOverrides[patch.file]; // undefined means "no override yet"
         const currentCode = nextOverrides[patch.file] !== undefined
           ? nextOverrides[patch.file]
           : (window.PR_FILES[id].find(f => f.name === patch.file)?.code || '');
@@ -256,6 +267,7 @@ const PageReview = ({ ctx, prId }) => {
         actions: { ...prev.actions, [s.id]: kind },
         score: newScore,
         fileOverrides: nextOverrides,
+        undoStore: { ...(prev.undoStore || {}), [s.id]: snapshot },
       };
     });
 
@@ -278,9 +290,40 @@ const PageReview = ({ ctx, prId }) => {
       ...prev,
       actions: { ...prev.actions, [s.id]: 'declined' },
       declineReasons: { ...prev.declineReasons, [s.id]: reason },
+      // Declining has no score or file change, but we still record an entry so undo works uniformly
+      undoStore: { ...(prev.undoStore || {}), [s.id]: { scoreDelta: 0 } },
     }));
     setDeclineFor(null);
     ctx.pushToast('Suggestion declined', `Reason: ${reason} · Manager view updated.`);
+  };
+  const undo = (s) => {
+    if (!isInteractive || readOnly) return;
+    ctx.setPr184(prev => {
+      const snap = (prev.undoStore || {})[s.id];
+      const prevAction = prev.actions[s.id];
+      if (!snap && !prevAction) return prev;
+      const nextActions = { ...prev.actions }; delete nextActions[s.id];
+      const nextDeclineReasons = { ...(prev.declineReasons || {}) }; delete nextDeclineReasons[s.id];
+      const nextOverrides = { ...(prev.fileOverrides || {}) };
+      if (snap && snap.file !== undefined) {
+        if (snap.prevFileContent === undefined) {
+          delete nextOverrides[snap.file];
+        } else {
+          nextOverrides[snap.file] = snap.prevFileContent;
+        }
+      }
+      const nextUndoStore = { ...(prev.undoStore || {}) }; delete nextUndoStore[s.id];
+      const newScore = Math.max(0, prev.score - ((snap && snap.scoreDelta) || 0));
+      return {
+        ...prev,
+        actions: nextActions,
+        score: newScore,
+        fileOverrides: nextOverrides,
+        declineReasons: nextDeclineReasons,
+        undoStore: nextUndoStore,
+      };
+    });
+    ctx.pushToast('Action undone', 'Suggestion is back to pending.');
   };
 
   // Suggestions for active file (with synthetic statuses for non-interactive PRs)
@@ -422,7 +465,7 @@ const PageReview = ({ ctx, prId }) => {
             </div>
           </div>
 
-          <div style={{ padding: 16, maxHeight: 'calc(100vh - 320px)', overflowY: 'auto' }}>
+          <div style={{ padding: 16 }}>
             {fileSugs.length === 0 ? (
               <div style={{ padding: '32px 14px', textAlign: 'center' }}>
                 <div className="row center" style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(79,184,155,0.18)', color: '#87D6BC', margin: '0 auto 12px' }}>
@@ -443,6 +486,7 @@ const PageReview = ({ ctx, prId }) => {
                     readOnly={readOnly || !isInteractive}
                     onAct={act}
                     onDecline={decline}
+                    onUndo={undo}
                     onHoverLine={setHoveredLine}
                     focused={hoveredLine === s.id}
                   />

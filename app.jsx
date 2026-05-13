@@ -5,7 +5,6 @@ const { useState, useEffect, useRef, useMemo, useCallback } = React;
 // =============== Blog post catalog ===============
 const BLOG_POSTS = [
   { slug: 'presentation', short: 'Presentation', sub: 'About this app' },
-  { slug: 'meta',         short: 'Meta',         sub: 'The engine, not the app' },
   { slug: 'expanding',    short: 'Expanding',    sub: 'Readiness beyond PRs' },
 ];
 const VALID_SLUGS = BLOG_POSTS.map(p => p.slug);
@@ -58,10 +57,10 @@ const TABS = {
 
 // =============== Top Bar ===============
 const FROSTED_AVATAR = {
-  background: 'rgba(26, 22, 38, 0.72)',
+  background: 'linear-gradient(135deg, rgba(255,255,255,0.78), rgba(221,231,247,0.62) 55%, rgba(232,228,245,0.7))',
   backdropFilter: 'blur(10px) saturate(160%)',
   WebkitBackdropFilter: 'blur(10px) saturate(160%)',
-  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 2px 6px -2px rgba(26,22,38,0.45)',
+  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.85), 0 2px 6px -2px rgba(42,36,56,0.18)',
 };
 
 function TopBar({ user, switchUser, page, setPage, blogSlug, goToBlog }) {
@@ -241,7 +240,7 @@ function TopBar({ user, switchUser, page, setPage, blogSlug, goToBlog }) {
             >
               <div className="row center" style={{
                 width: 30, height: 30, borderRadius: '50%',
-                color: 'white', fontSize: 12, fontWeight: 600,
+                color: 'var(--text-1)', fontSize: 12, fontWeight: 600,
                 ...FROSTED_AVATAR,
               }}>{user.initials}</div>
               <div style={{ textAlign: 'left' }}>
@@ -265,7 +264,7 @@ function TopBar({ user, switchUser, page, setPage, blogSlug, goToBlog }) {
                   >
                     <div className="row center" style={{
                       width: 28, height: 28, borderRadius: '50%',
-                      color: 'white', fontSize: 11, fontWeight: 600,
+                      color: 'var(--text-1)', fontSize: 11, fontWeight: 600,
                       ...FROSTED_AVATAR,
                     }}>{u.initials}</div>
                     <div style={{ textAlign: 'left', flex: 1 }}>
@@ -277,10 +276,6 @@ function TopBar({ user, switchUser, page, setPage, blogSlug, goToBlog }) {
                     )}
                   </button>
                 ))}
-                <div className="divider-dark" style={{ margin: '6px 0' }}></div>
-                <div className="t-12 glass-text-3" style={{ padding: '6px 10px', lineHeight: 1.5 }}>
-                  Each identity sees only the tabs and actions appropriate to their role.
-                </div>
               </div>
             )}
           </div>

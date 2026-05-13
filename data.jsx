@@ -631,7 +631,7 @@ window.SPRINT_LABELS = ['S20', 'S21', 'S22', 'S23', 'S24', 'S25'];
 window.TEAM_HISTORY = {
   payments: { usage: [8,  14, 28, 45, 60, 74], approvalH: [24, 22, 19, 16, 13, 11], color: '#6B6BFF' },
   growth:   { usage: [38, 42, 48, 52, 58, 62], approvalH: [28, 24, 21, 18, 16, 14], color: '#5E9BD6' },
-  // Platform: AI readiness slightly declining; approval time slightly worsening
+  // Platform: PR readiness slightly declining; approval time slightly worsening
   platform: { usage: [28, 27, 27, 26, 25, 24], approvalH: [28, 29, 29, 30, 30, 31], color: '#2A2438' },
   // Data: flat — no real improvement on either
   data:     { usage: [21, 22, 22, 21, 22, 22], approvalH: [29, 29, 30, 29, 30, 29], color: '#9A93A8' },

@@ -5,90 +5,105 @@
 function PostPresentation() {
   return (
     <>
-      <p className="lead">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-      </p>
+      <h2>The Problem:</h2>
+      <p>Chico.ai monitors AI use, but does nothing to improve adoption.</p>
+      <p>We want a feature that is narrow enough it can be built fast and quickly validate or dismiss its existence.</p>
+      <p>And broad enough that if it works, its theory or model is generalizable.</p>
+
+      <h2>Tensions/Obstacles:</h2>
+      <ul>
+        <li>
+          Multiple stakeholders with different goals; roughly CEOs vs Managers vs Workers
+          <ul>
+            <li>CEOs want a ROI</li>
+            <li>Managers need to be convinced it works because they are afraid of losing time and don't want their teams to feel surveilled</li>
+            <li>Workers need to feel comfortable and helped, not forced</li>
+          </ul>
+        </li>
+        <li>A very specific workflow demos well, but may not scale.</li>
+        <li>You can design things that people engage with when they are forced to, but then they don't actually use them in real life</li>
+        <li>How do you tie ROI to AI usage?</li>
+      </ul>
+
+      <h2>Things I want from my system:</h2>
+      <ul>
+        <li>Integrated into real work, or real systems that people already use</li>
+        <li>Involving both managers and workers. Managers because they can both monitor and convince their teams; workers because they are more likely tied to ROI than the managers.</li>
+        <li>Suggestive, not prescriptive. Think « you could try this » rather than « you must do this » {'->'} This is crucial in my opinion: showing workers what the AI can do for them and showing them how it helps others, will I think lead to adoption IF the AI does indeed improve the work produced</li>
+        <li>Be a sort of « loop » where the AI adoption is tied into to a real metric</li>
+      </ul>
+
+      <p>To solve for this problem, I must pick a specific use case.</p>
+      <p>How do I choose?</p>
+
+      <p>Chico customers</p>
+      <ul>
+        <li>Finance</li>
+        <li>Professional services</li>
+        <li>Retail</li>
+        <li>Healthcare</li>
+      </ul>
+
+      <p>While this might not be obvious, I like the idea of building an AI adoption system for software developers.</p>
+      <ul>
+        <li>This is an area I am extremely familiar with so I can build something relevant quickly</li>
+        <li>I know firsthand that many developers are NOT caught up with AI</li>
+        <li>Many of our customers will have engineering managers struggling with AI adoption, so it is relevant</li>
+        <li>The more objective nature of software makes it easier to measure</li>
+        <li>As I will detail below, this is something we can easily scale to other jobs.</li>
+      </ul>
+
+      <p>Tech leads / Product Managers are faced with the same problem when it comes to adoption:</p>
+      <p>I'm told I need to increase AI use, but how do I do it? How do I convince my team to use AI? Is it even good for our use cases?</p>
+
+      <p>My solution resolves the problems and tensions listed above.</p>
+
+      <h2>Introducing: ChicoAI's PR Readiness.</h2>
+      <p>(PR = Pull Request. The developer is asking the manager/team « Can you please add my newly written code to the remote codebase »)</p>
+
+      <p>The PR readiness system does a few things:</p>
+      <p>At its core, it is a github plugin that enables your company's AI (whatever it is) to suggest PR improvements. In the real product, this would live inside GitHub as a PR check/comment. In the prototype, I'm showing the full flow in a standalone app.</p>
+      <p>This is a win for developers because it does not force them to use AI; instead it lets them see how it simplifies their work by reducing PR approval time. Developers can accept an AI suggestion, and if they don't like it, undo it.</p>
+      <p>However, it was just that, it would be a lesser Copilot clone.</p>
+      <p>On top of the PR improving AI, we also measure two crucial metrics: (1) how much the developers are using the AI suggestions (2) How long until a PR gets approved.</p>
+      <p>This enables us to measure correlation.</p>
+      <p>Managers can inspect PR-level activity and see team-level patterns.</p>
+      <p>Everyone sees the performance and AI use of the other teams.</p>
+
+      <p>This in my opinion gives Chico.ai the perfect balance of:</p>
+      <ul>
+        <li>A suggestive AI that invites developers to use it without forcing them, letting them get familiar over time</li>
+        <li>A monitoring and comparative tool that enables managers to see the impact of AI on ROI, and can see the performance of their team vs others</li>
+      </ul>
+
       <hr />
 
-      <div className="eyebrow">Section 1</div>
-      <h2>The problem</h2>
-      <p>
-        Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.
-      </p>
-      <p>
-        Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur.
-      </p>
+      <p>The main counter argument to this feature is it is not representative of our customers, such that it won't scale.</p>
+      <p>But engineering is not the whole market, it is easiest measurable process. The general pattern is workflow readiness.</p>
 
-      <div className="eyebrow">Section 2</div>
-      <h2>How chico.ai works</h2>
-      <p>
-        At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga.
-      </p>
-      <p>
-        Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus.
-      </p>
-
-      <div className="eyebrow">Section 3</div>
-      <h2>What this prototype shows</h2>
-      <p>
-        Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat. Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris.
-      </p>
-      <p>
-        Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula. Donec lobortis risus a elit. Etiam tempor. Ut ullamcorper, ligula eu tempor congue, eros est euismod turpis, id tincidunt sapien risus a quam. Maecenas fermentum consequat mi. Donec fermentum.
-      </p>
-
-      <div className="eyebrow">Section 4</div>
-      <h2>What comes next</h2>
-      <p>
-        Quisque a lectus. Donec consectetuer ligula vulputate sem tristique cursus. Nam nulla quam, gravida non, commodo a, sodales sit amet, nisi. Pellentesque fermentum dolor. Aliquam quam lectus, facilisis auctor, ultrices ut, elementum vulputate, nunc.
-      </p>
-    </>
-  );
-}
-
-function PostMeta() {
-  return (
-    <>
-      <p className="lead">
-        My first instinct was to skip past the obvious task of <em>designing a feature for a specific user</em>. The interesting problem sits upstream of that — building the engine that lets the right person at any company shape their own version of it.
-      </p>
       <hr />
 
-      <div className="eyebrow">Section 1</div>
-      <h2>Why an engine, not an app</h2>
-      <p>
-        Every business has a slightly different version of the same motion: <strong>make this output ready before a human looks at it.</strong> Pull requests. Specifications. Sales call briefs. Support tickets. Incident write-ups. Quarterly reports. Designing a tool around any one of those traps the team in someone else's shape — and the shape is almost always wrong by a few inches.
-      </p>
-      <p>
-        The interesting bet is on the layer underneath: a scoring loop, a suggestion pipeline, role-scoped surfaces, telemetry on what gets accepted and ignored. Everything visible in this prototype is a particular configuration of that loop, not the loop itself.
-      </p>
+      <h2>Weaknesses/future problems</h2>
+      <ul>
+        <li>PR base Readiness score currently arbitrary</li>
+        <li>Adds an extra step to the workflow that might feel clunky and frustrating to developers (many analytics tools share this problem)</li>
+        <li>
+          PR Approval time might be an untrustworthy metric: maybe you ship more code that is worse. This is a common problem with easy to track metrics. Potential solutions include
+          <ul>
+            <li>Another AI rating the quality of outputted code</li>
+            <li>A human + AI review of the outputted code; done using the time saved by the reduced PR approval time.</li>
+          </ul>
+        </li>
+      </ul>
 
-      <div className="eyebrow">Section 2</div>
-      <h2>Who builds it</h2>
-      <p>
-        The right collaborator is what I'd call an <strong>AI lead</strong> — someone inside the company who knows the work intimately and is empowered to co-build with us and an AI. Sometimes this is a permanent role, sometimes a temporary one created for the engagement. Either way, the crucial thing is authority: they get to define what "ready" means in their domain, and they can iterate on it without a months-long product cycle on our side.
-      </p>
-      <p>
-        Without that person, every implementation drifts back into a generic dashboard. With them, the rubric stays alive. They notice when "high readiness, slow approval" is the actual signal worth chasing this quarter, and they tune the surfaces to put that pattern in front of the manager.
-      </p>
+      <hr />
 
-      <div className="eyebrow">Section 3</div>
-      <h2>What chico.ai actually is</h2>
-      <p>
-        A scaffolding for that collaboration. It hands the AI lead the building blocks — readiness scoring, suggestion pipelines, role-scoped surfaces, telemetry — and then gets out of the way. The PR Readiness demo you see in this prototype is what came out when we ran that engine for an engineering team.
-      </p>
-      <p>
-        Run it for legal, sales, support, or finance and the surfaces would look different, but the contract underneath is the same: produce, score, suggest, accept or fix, ship. Everything else is configuration.
-      </p>
-
-      <div className="eyebrow">Section 4</div>
-      <h2>The bet</h2>
-      <p>
-        That generality wins. A feature for one person can be cloned in a quarter. An engine that turns a domain expert inside a company into a software author for their own team is harder to copy, because the moat is the relationship with the AI lead, not the rectangles on the screen.
-      </p>
-      <p>
-        Put differently: the defensible thing is the engine plus the people we partner with to run it — not this prototype.
-      </p>
+      <h2>Business case: How do we scale this in 3/6/12 months? How would I measure it?</h2>
+      <ul>
+        <li>3 months: pilot with 3 to 5 engineering teams</li>
+        <li>6 months: prove adoption and review-cycle improvement</li>
+        <li>12 months: expand to more workflows, such as sales calls, support tickets, finance reports</li>
+      </ul>
     </>
   );
 }
@@ -101,7 +116,6 @@ function PostExpanding() {
       </p>
       <hr />
 
-      <div className="eyebrow">Section 1</div>
       <h2>What "readiness" actually means</h2>
       <p>
         A readiness score answers a single question: <strong>if a reviewer were to look at this right now, what would they probably say?</strong> The system scores the artifact, surfaces specific suggestions, and offers a one-click path to apply them. The pre-review loop closes faster, and the reviewer sees a cleaner artifact when they finally arrive.
@@ -110,7 +124,6 @@ function PostExpanding() {
         Nothing about that loop is specific to pull requests. The artifact changes; the loop is invariant.
       </p>
 
-      <div className="eyebrow">Section 2</div>
       <h2>Where else this can apply</h2>
       <p>
         The same loop fits a wide range of work products. Below is a non-exhaustive list — for each, the format is the same: who does the work, where in their flow the readiness check sits, what the AI surfaces, the metric a manager would actually pull on, and the comparative story that makes adoption legible.
@@ -188,7 +201,6 @@ function PostExpanding() {
         <li><strong>Manager pull</strong> — show that AI checks close claims faster without quality loss.</li>
       </ul>
 
-      <div className="eyebrow">Section 3</div>
       <h2>Across segments</h2>
       <p>
         The engine is industry-agnostic; the readiness rubric is not. The interesting work is in shaping the rubric per segment — and that's exactly what the AI lead at each company is positioned to do.
@@ -200,7 +212,6 @@ function PostExpanding() {
         <li><strong>Healthcare</strong> — privacy guardrails, evidence grade, payer alignment, clinical-pathway adherence.</li>
       </ul>
 
-      <div className="eyebrow">Section 4</div>
       <h2>What stays the same</h2>
       <p>
         Whatever the artifact and whatever the segment, the motion is the same: <em>produce, score, suggest, accept or fix, ship</em>. The AI lead at each company shapes the rubric and the suggestion bank; chico.ai runs the loop. The screen looks different for a pre-call brief than for a pull request, but the engine underneath does not change.
@@ -215,19 +226,13 @@ function PostExpanding() {
 const POSTS = {
   presentation: {
     eyebrow: 'Presentation',
-    title:   'chico.ai — PR Readiness',
+    title:   'chico.ai • PR Readiness',
     lead:    'A short walk-through of what this prototype is, the problem it tries to solve, and how the pieces fit together.',
     body:    PostPresentation,
   },
-  meta: {
-    eyebrow: 'Origin',
-    title:   'Meta — the engine, not the app',
-    lead:    'Why this prototype was scoped around an engine and an AI lead, instead of a feature for one named persona.',
-    body:    PostMeta,
-  },
   expanding: {
     eyebrow: 'Roadmap',
-    title:   'Expanding — beyond pull requests',
+    title:   'Expanding • beyond pull requests',
     lead:    'Where the PR Readiness loop goes next: adjacent work products, and how the rubric flexes across industries.',
     body:    PostExpanding,
   },
@@ -241,20 +246,20 @@ const PageBlog = ({ ctx, slug }) => {
     <div className="col gap-20" style={{ alignItems: 'center', paddingTop: 12, paddingBottom: 40 }}>
 
       {/* Header card */}
-      <div className="pillow p-32" style={{ maxWidth: 860, width: '100%' }}>
-        <div className="row gap-12 wrap mb-12" style={{ alignItems: 'center' }}>
+      <div className="pillow p-32" style={{ maxWidth: 1032, width: '100%', textAlign: 'center' }}>
+        <div className="row gap-12 wrap mb-12" style={{ alignItems: 'center', justifyContent: 'center' }}>
           <span className="pill pill-accent">Blog</span>
           <span className="t-12 text-3 uppercase">{post.eyebrow}</span>
           <span className="t-14 w-600 text-1">Adrien Larere</span>
         </div>
         <div className="t-40 text-1">{post.title}</div>
-        <div className="t-16 text-2 mt-12" style={{ maxWidth: 640, lineHeight: 1.6 }}>
+        <div className="t-16 text-2 mt-12" style={{ maxWidth: 640, lineHeight: 1.6, marginLeft: 'auto', marginRight: 'auto' }}>
           {post.lead}
         </div>
       </div>
 
       {/* Body card */}
-      <div className="pillow" style={{ maxWidth: 860, width: '100%', padding: '48px 64px' }}>
+      <div className="pillow" style={{ maxWidth: 1032, width: '100%', padding: '48px 64px' }}>
         <div className="prose" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
           <Body />
         </div>

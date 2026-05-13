@@ -5,13 +5,13 @@ const PageROI = ({ ctx }) => {
 
   const graphs = [
     {
-      title: 'AI readiness × approval time',
-      sub: 'One dot per team. Higher AI readiness usage is associated with faster median approval.',
+      title: 'PR readiness × approval time',
+      sub: 'One dot per team. Higher PR readiness usage is associated with faster median approval.',
       render: () => <ScatterGraph />,
     },
     {
-      title: 'AI readiness over time',
-      sub: 'Share of opened PRs that received an AI readiness review, by sprint.',
+      title: 'PR readiness over time',
+      sub: 'Share of opened PRs that received an PR readiness review, by sprint.',
       render: () => <TimeGraph series="usage" yLabel="% of PRs" yMin={0} yMax={100} ySuffix="%" />,
     },
     {
@@ -78,7 +78,7 @@ const PageROI = ({ ctx }) => {
           <thead>
             <tr>
               <th>Team</th>
-              <th>AI readiness usage</th>
+              <th>PR readiness usage</th>
               <th>Suggestions acted on</th>
               <th>Median approval</th>
               <th>Review cycles</th>
@@ -137,14 +137,14 @@ function ScatterGraph() {
         {[0, 25, 50, 75, 100].map(x => (
           <text key={x} x={xs(x)} y={H - PAD.b + 18} textAnchor="middle" fontSize="11" fill="var(--text-3)">{x}%</text>
         ))}
-        <text x={(PAD.l + W - PAD.r) / 2} y={H - 6} textAnchor="middle" fontSize="11" fill="var(--text-3)">AI readiness usage</text>
+        <text x={(PAD.l + W - PAD.r) / 2} y={H - 6} textAnchor="middle" fontSize="11" fill="var(--text-3)">PR readiness usage</text>
         <text transform={`translate(16, ${(PAD.t + H - PAD.b) / 2}) rotate(-90)`} textAnchor="middle" fontSize="11" fill="var(--text-3)">Median approval time</text>
         <line x1={xs(trend[0].x)} y1={ys(trend[0].y)} x2={xs(trend[1].x)} y2={ys(trend[1].y)} stroke="#B5B5FF" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.7" />
         {window.TEAMS.map(t => {
           const color = window.TEAM_HISTORY[t.id].color;
           return (
             <g key={t.id} style={{ cursor: 'pointer' }}>
-              <title>{`${t.name} — ${t.usage}% AI readiness usage, ${t.approvalH}h median approval`}</title>
+              <title>{`${t.name} — ${t.usage}% PR readiness usage, ${t.approvalH}h median approval`}</title>
               <circle cx={xs(t.usage)} cy={ys(t.approvalH)} r={14} fill={color} opacity="0.18" />
               <circle cx={xs(t.usage)} cy={ys(t.approvalH)} r={8} fill={color} />
               <text x={xs(t.usage)} y={ys(t.approvalH) - 16} textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--text-1)">{t.name}</text>
