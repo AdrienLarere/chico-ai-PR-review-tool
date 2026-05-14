@@ -11,63 +11,72 @@ function PostPresentation({ ctx }) {
     <>
       <h2>The Problem</h2>
       <p>Chico.ai monitors AI use, but does nothing to improve adoption.</p>
-      <p>We want a feature that is narrow enough it can be built fast and quickly validate or dismiss its existence.</p>
-      <p>And broad enough that if it works, its theory or model is generalizable.</p>
+      <p>We want a feature that is
+        <ol>
+          <li><b>Narrow</b> enough it can be built fast, and quickly validate or dismiss its existence.</li>
+          <li><b>Broad</b> enough that if it works, its theory or model is generalizable.</li>
+        </ol>
+      </p>
 
-      <h2>Tensions/Obstacles</h2>
+      <h2>Tensions and Obstacles</h2>
       <ul>
         <li>
-          Multiple stakeholders with different goals; roughly CEOs vs Managers vs Workers
+          Multiple stakeholders with different goals. Roughly: CEOs vs Managers vs Workers
           <ul>
-            <li>CEOs want a ROI</li>
+            <li>CEOs want to see a return on their investment</li>
             <li>Managers need to be convinced it works because they are afraid of losing time and don't want their teams to feel surveilled</li>
             <li>Workers need to feel comfortable and helped, not forced</li>
           </ul>
         </li>
-        <li>A very specific workflow demos well, but may not scale.</li>
+        <li>A very specific workflow demos well but may not scale. Yet we must solve for a specific role.</li>
         <li>You can design things that people engage with when they are forced to, but then they don't actually use them in real life</li>
-        <li>How do you tie ROI to AI usage?</li>
+        <li>AI usage is easy to measure; ROI can be more nebulous</li>
       </ul>
 
-      <h2>Things I want from my system</h2>
+      <h2>Things I want from my feature</h2>
       <ul>
-        <li>Integrated into real work, or real systems that people already use</li>
-        <li>Involving both managers and workers. Managers because they can both monitor and convince their teams; workers because they are more likely tied to ROI than the managers.</li>
-        <li>Suggestive, not prescriptive. Think « you could try this » rather than « you must do this » {'->'} This is crucial in my opinion: showing workers what the AI can do for them and showing them how it helps others, will I think lead to adoption IF the AI does indeed improve the work produced</li>
-        <li>Be a sort of « loop » where the AI adoption is tied into to a real metric</li>
+        <li><b>Integrated</b> into real work/systems/processes</li>
+        <li><b>Involving both managers and workers</b>. Managers they need to be convinced to convince their teams; workers because they are probably more closely tied to ROI than the managers.</li>
+        <li><b>Suggestive, not prescriptive</b>. Think « you could try this » rather than « you must do this » &rarr; This is crucial in my opinion: showing workers what the AI can do for them and showing them how it helps others, will I think lead to adoption IF the AI does indeed improve the work produced</li>
+        <li>Be a sort of <b>loop</b> where the AI adoption is tied into to a real metric</li>
       </ul>
 
-      <p>To solve for this problem, I must pick a specific use case.</p>
-      <p>How do I choose?</p>
-
-      <p>Chico customers</p>
+    <h2>Solution</h2>
+      <p>I must pick a specific use case. How do I choose?</p>
+      <br/>
+      <p>Chico customers are mostly in</p>
       <ul>
         <li>Finance</li>
         <li>Professional services</li>
         <li>Retail</li>
         <li>Healthcare</li>
       </ul>
-
-      <p>While this might not be obvious, I like the idea of building an AI adoption system for software developers.</p>
+      <br/>
+      <p><b>I will build an AI adoption system for software developers</b>.</p>
+      <p>Given the industries of our clients, this may appear off-topic.</p>
+      <br/>
+      <p><b>Here is my reasoning:</b></p>
       <ul>
-        <li>This is an area I am extremely familiar with so I can build something relevant quickly</li>
-        <li>I know firsthand that many developers are NOT caught up with AI</li>
-        <li>Many of our customers will have engineering managers struggling with AI adoption, so it is relevant</li>
+        <li>Many of our clients have engineering teams. Finance, for example, offers a lot of digital products</li>
+        <li>I know firsthand that many developers are <b>not</b> caught up with AI</li>
+        <li>Some of our client's engineering teams will therefore be struggling with AI adoption</li>
         <li>The more objective nature of software makes it easier to measure</li>
-        <li>As I will detail below, this is something we can easily scale to other jobs.</li>
+        <li>This is an area I am extremely familiar with, so I can build something relevant quickly</li>
+        <li>As I will detail below, while this feature is targeted at engineering teams, it can be scaled to other roles</li>
       </ul>
-
+      <br/>
       <p>Tech leads / Product Managers are faced with the same problem when it comes to adoption:</p>
       <p>I'm told I need to increase AI use, but how do I do it? How do I convince my team to use AI? Is it even good for our use cases?</p>
 
       <p>My solution resolves the problems and tensions listed above.</p>
 
       <h2>Introducing: ChicoAI's PR Readiness.</h2>
-      <p>(PR = Pull Request. The developer is asking the manager/team « Can you please add my newly written code to the remote codebase »)</p>
+      <p><i>PR = Pull Request. The developer is submitting code changes and asking the manager/team "Can you please review my code before adding it to the codebase"</i></p>
+      <br/>
 
       <p>The PR readiness system does a few things:</p>
       <p>At its core, it is a github plugin that enables your company's AI (whatever it is) to suggest PR improvements. In the real product, this would live inside GitHub as a PR check/comment. In the prototype, I'm showing the full flow in a standalone app.</p>
-      <p>This is a win for developers because it does not force them to use AI; instead it lets them see how it simplifies their work by reducing PR approval time. Developers can accept an AI suggestion, and if they don't like it, undo it.</p>
+      <p>This is a win for developers because it does not <i>force</i> them to use AI; instead it lets them see how it simplifies their work by reducing PR approval time. Developers can accept an AI suggestion, and if they don't like it, undo it.</p>
       <p>However, it was just that, it would be a lesser Copilot clone.</p>
       <p>On top of the PR improving AI, we also measure two crucial metrics: (1) how much the developers are using the AI suggestions (2) How long until a PR gets approved.</p>
       <p>This enables us to measure correlation.</p>
@@ -83,20 +92,21 @@ function PostPresentation({ ctx }) {
       <hr />
 
       <h2>Too narrow?</h2>
-      <p>The main counter argument to this feature is it is not representative of our customers, such that it won't scale.</p>
-      <p>But engineering is not the whole market, it is easiest measurable process. The general pattern is workflow readiness.</p>
+      <p>The main counter argument to this feature is that it is not representative of our customers, such that it won't scale.</p>
+      <p>Engineering is not the whole market indeed; but it is one of the easiest measurable process to test the correlation between AI adoption and ROI.</p> 
+      <p><b>The general pattern is workflow readiness.</b></p>
       <p>
-        <a href="/blog/expanding" onClick={openExpanding} className="prose-link">Read more here</a>
+        <a href="/blog/expanding" onClick={openExpanding} className="prose-link">Click here to find out about ways this solution can work for other roles</a>
       </p>
 
       <hr />
 
       <h2>Weaknesses/future problems</h2>
       <ul>
-        <li>PR base Readiness score currently arbitrary</li>
-        <li>Adds an extra step to the workflow that might feel clunky and frustrating to developers (many analytics tools share this problem)</li>
+        <li>PR base Readiness score is currently arbitrary. A lot of the numbers on the app are made up to bring the feature to life.</li>
+        <li>The tool adds an extra step to the workflow that might feel clunky and frustrating to developers. This is a known problem for analytics tools.</li>
         <li>
-          PR Approval time might be an untrustworthy metric: maybe you ship more code that is worse. This is a common problem with easy to track metrics. Potential solutions include
+          PR Approval time might be an untrustworthy metric: maybe you ship code faster, but it is worse. This is a common problem with easy-to-track metrics. Potential solutions include
           <ul>
             <li>Another AI rating the quality of outputted code</li>
             <li>A human + AI review of the outputted code; done using the time saved by the reduced PR approval time.</li>
@@ -106,7 +116,7 @@ function PostPresentation({ ctx }) {
 
       <hr />
 
-      <h2>Business case: How do we scale this in 3/6/12 months? How would I measure it?</h2>
+      <h2>How do we scale this in 3/6/12 months? How do we measure success?</h2>
       <ul>
         <li>3 months: pilot with 3 to 5 engineering teams</li>
         <li>6 months: prove adoption and review-cycle improvement</li>
