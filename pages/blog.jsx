@@ -36,15 +36,15 @@ function PostPresentation({ ctx }) {
       <h2>Things I want from my feature</h2>
       <ul>
         <li><b>Integrated</b> into real work/systems/processes</li>
-        <li><b>Involving both managers and workers</b>. Managers because they need to be convinced to convince their teams; workers because they are probably more closely tied to ROI than the managers.</li>
-        <li><b>Suggestive, not prescriptive</b>. Think « you could try this » rather than « you must do this » &rarr; This is crucial in my opinion: showing workers what the AI can do for them and showing them how it helps others, will I think lead to adoption IF the AI does indeed improve the work produced</li>
+        <li><b>Involving both managers and workers</b>. Managers because they need to be convinced to convince their teams; workers because they are probably more closely tied to "real metrics" than the managers.</li>
+        <li><b>Suggestive, not prescriptive</b>. Think "you could try this" rather than "you must do this"<br/>&rarr; This is crucial in my opinion: showing workers what the AI can do for them and showing them how it helps others, will I think lead to adoption IF the AI does indeed improve the work produced</li>
         <li>Be a sort of <b>loop</b> where the AI adoption is tied to to a real metric</li>
       </ul>
 
     <h2>Solution</h2>
       <p>I must pick a specific use case. How do I choose?</p>
       <br/>
-      <p>Chico customers are mostly in</p>
+      <p>Chico customers are mostly in:</p>
       <ul>
         <li>Finance</li>
         <li>Professional services</li>
@@ -53,9 +53,8 @@ function PostPresentation({ ctx }) {
       </ul>
       <br/>
       <p><b>I will build an AI adoption system for software developers</b>.</p>
-      <p><i>Specifically</i>, a A busy technical manager <i>and their team</i> of 5 developers, within a company with several other similar teams.</p>
+      <p><i>Specifically</i>, a A busy technical manager <i>and their team</i> of ~5 developers, working in a company with several other technical teams.</p>
       <br/>
-      <p>This is the way to create a product that serves both managers and workers.</p>
       <p>Given the industries of our clients, this may appear off-topic.</p>
       <br/>
       <p><b>Here is my reasoning:</b></p>
@@ -69,8 +68,9 @@ function PostPresentation({ ctx }) {
       </ul>
       <br/>
       <p>Tech leads / Product Managers are faced with the same problem when it comes to adoption:</p>
-      <p>I'm told I need to increase AI use, but how do I do it? How do I convince my team to use AI? Is it even good for our use cases?</p>
+      <p>"I'm told I need to increase AI use, but how do I do it? How do I convince my team to use AI? Is it even relevant to our use cases?"</p>
 
+      <br/>
       <p>My solution resolves the problems and tensions listed above.</p>
 
       <h2>Introducing: ChicoAI's PR Readiness.</h2>
@@ -78,14 +78,14 @@ function PostPresentation({ ctx }) {
       <br/>
 
       <p>The PR readiness system does a few things:</p>
-      <p>At its core, it is a github plugin that enables your company's AI (whatever it is) to suggest PR improvements. In the real product, this would live inside GitHub as a PR check/comment. In the prototype, I'm showing the full flow in a standalone app.</p>
+      <p>At its core, it is a github plugin that enables your company's AI (whatever it is) to suggest PR improvements. In the real product, this would live partly inside GitHub as a PR check/comment. In the prototype, I'm showing the full flow in a standalone app.</p>
       <p>This is a win for developers because it does not <i>force</i> them to use AI; instead it lets them see how it simplifies their work by reducing PR approval time. Developers can accept an AI suggestion, and if they don't like it, undo it.</p>
       <p>However, it was just that, it would be a lesser Copilot clone.</p>
       <p>On top of the PR improving AI, we also measure two crucial metrics: (1) how much the developers are using the AI suggestions (2) How long until a PR gets approved.</p>
       <p>This enables us to measure correlation.</p>
       <p>Managers can inspect PR-level activity and see team-level patterns.</p>
       <p>Everyone sees the performance and AI use of the other teams.</p>
-
+      <br/>
       <p>This in my opinion gives Chico.ai the perfect balance of:</p>
       <ul>
         <li>A suggestive AI that invites developers to use it without forcing them, letting them get familiar over time</li>
