@@ -383,6 +383,29 @@ function App() {
     initialScore: 72,
   });
 
+  // Browser tab title — derived from the current page + identity.
+  useEffect(() => {
+    const firstName = user.name.split(' ')[0];
+    let t = 'PR Readiness';
+    if (page === 'blog') {
+      const post = BLOG_POSTS_BY_SLUG[blogSlug];
+      t = `PR Readiness - Blog - ${post ? post.short : 'Blog'}`;
+    } else if (page === 'admin') {
+      t = 'PR Readiness - Admin';
+    } else if (page === 'prdetail') {
+      t = `PR Readiness - ${firstName} - PR #${currentPrId}`;
+    } else if (page === 'prlist') {
+      t = `PR Readiness - ${firstName} - My PRs`;
+    } else if (page === 'dashboard') {
+      t = `PR Readiness - ${firstName} - Dashboard`;
+    } else if (page === 'queue') {
+      t = `PR Readiness - ${firstName} - PR Queue`;
+    } else if (page === 'roi') {
+      t = `PR Readiness - ${firstName} - Team Performance`;
+    }
+    document.title = t;
+  }, [page, blogSlug, currentPrId, user.name]);
+
   // Toasts
   const [toasts, setToasts] = useState([]);
   const pushToast = useCallback((title, sub) => {
