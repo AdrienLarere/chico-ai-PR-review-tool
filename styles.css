@@ -726,21 +726,23 @@ code, pre, .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
 }
 
 /* Blog-page side icons — floaty bouncy bears flanking the header card.
-   Centered in the gap between the card edge and the viewport edge. */
+   Fixed to the viewport so they don't scroll with the page; centered
+   in the gap between the card edge (1032px max card) and the screen edge:
+   gap-midpoint = (100vw − 1032px) / 4. */
 .blog-side-icon {
-  position: absolute;
-  top: 50%;
+  position: fixed;
+  top: 200px;
   width: 128px;
   height: 128px;
   pointer-events: none;
-  z-index: 0;
+  z-index: 5;
 }
 .blog-side-icon-left {
-  left: -102px;
+  left: calc((100vw - 1032px) / 4);
   transform: translate(-50%, -50%);
 }
 .blog-side-icon-right {
-  right: -102px;
+  right: calc((100vw - 1032px) / 4);
   transform: translate(50%, -50%);
 }
 .blog-side-icon img {
