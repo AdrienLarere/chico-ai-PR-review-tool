@@ -36,7 +36,7 @@ function PostPresentation({ ctx }) {
       <h2>Things I want from my feature</h2>
       <ul>
         <li><b>Integrated</b> into real work/systems/processes</li>
-        <li><b>Involving both managers and workers</b>. Managers they need to be convinced to convince their teams; workers because they are probably more closely tied to ROI than the managers.</li>
+        <li><b>Involving both managers and workers</b>. Managers because they need to be convinced to convince their teams; workers because they are probably more closely tied to ROI than the managers.</li>
         <li><b>Suggestive, not prescriptive</b>. Think « you could try this » rather than « you must do this » &rarr; This is crucial in my opinion: showing workers what the AI can do for them and showing them how it helps others, will I think lead to adoption IF the AI does indeed improve the work produced</li>
         <li>Be a sort of <b>loop</b> where the AI adoption is tied to to a real metric</li>
       </ul>
@@ -98,6 +98,7 @@ function PostPresentation({ ctx }) {
       <p>The main counter argument to this feature is that it is not representative of our customers, such that it won't scale.</p>
       <p>Engineering is not the whole market indeed; but it is one of the easiest measurable process to test the correlation between AI adoption and ROI.</p> 
       <p><b>The general pattern is workflow readiness.</b></p>
+      <br/>
       <p>
         <a href="/blog/expanding" onClick={openExpanding} className="prose-link">Click here to find out about ways this solution can work for other roles</a>
       </p>
@@ -138,8 +139,9 @@ function PostPresentation({ ctx }) {
         <li>6 months: proof that the Readiness pattern works in other review-heavy workflows like sales calls and claims. We iterate, improve, and start building the product for different roles and workflows.</li>
         <li>12 months: Chico should become the layer that helps enterprises turn AI from generic licences into role-specific workflows, then measure whether those workflows actually change business outcomes.</li>
       </ul>
+      <br/>
       <p>
-        <a href="/blog/expanding" onClick={openExpanding} className="prose-link">The scale programme</a>.
+        <a href="/blog/expanding" onClick={openExpanding} className="prose-link">The scale programme</a>
       </p>
     </>
   );
