@@ -38,7 +38,7 @@ function PostPresentation({ ctx }) {
         <li><b>Integrated</b> into real work/systems/processes</li>
         <li><b>Involving both managers and workers</b>. Managers they need to be convinced to convince their teams; workers because they are probably more closely tied to ROI than the managers.</li>
         <li><b>Suggestive, not prescriptive</b>. Think « you could try this » rather than « you must do this » &rarr; This is crucial in my opinion: showing workers what the AI can do for them and showing them how it helps others, will I think lead to adoption IF the AI does indeed improve the work produced</li>
-        <li>Be a sort of <b>loop</b> where the AI adoption is tied into to a real metric</li>
+        <li>Be a sort of <b>loop</b> where the AI adoption is tied to to a real metric</li>
       </ul>
 
     <h2>Solution</h2>
@@ -53,6 +53,9 @@ function PostPresentation({ ctx }) {
       </ul>
       <br/>
       <p><b>I will build an AI adoption system for software developers</b>.</p>
+      <p><i>Specifically</i>, a A busy technical manager <i>and their team</i> of 5 developers, within a company with several other similar teams.</p>
+      <br/>
+      <p>This is the way to create a product that serves both managers and workers.</p>
       <p>Given the industries of our clients, this may appear off-topic.</p>
       <br/>
       <p><b>Here is my reasoning:</b></p>
@@ -358,7 +361,13 @@ const PageBlog = ({ ctx, slug }) => {
     <div className="col gap-20" style={{ alignItems: 'center', paddingTop: 12, paddingBottom: 40 }}>
 
       {/* Header card */}
-      <div className="pillow p-32" style={{ maxWidth: 1032, width: '100%', textAlign: 'center' }}>
+      <div className="pillow p-32" style={{ maxWidth: 1032, width: '100%', textAlign: 'center', position: 'relative' }}>
+        <div className="blog-side-icon blog-side-icon-left" aria-hidden="true">
+          <img src="assets/chico-bear.png" alt="" />
+        </div>
+        <div className="blog-side-icon blog-side-icon-right" aria-hidden="true">
+          <img src="assets/chico-bear.png" alt="" />
+        </div>
         <div className="row gap-12 wrap mb-12" style={{ alignItems: 'center', justifyContent: 'center' }}>
           <span className="pill pill-accent">Blog</span>
           <span className="t-12 text-3 uppercase">{post.eyebrow}</span>
