@@ -10,8 +10,8 @@ const PageROI = ({ ctx }) => {
       render: () => <ScatterGraph />,
     },
     {
-      title: 'PR readiness over time',
-      sub: 'Share of opened PRs that received an PR readiness review, by sprint.',
+      title: 'AI usage by team, over time',
+      sub: "Share of each team's PRs that went through a PR readiness review, by sprint. Higher = more AI use.",
       render: () => <TimeGraph series="usage" yLabel="% of PRs" yMin={0} yMax={100} ySuffix="%" />,
     },
     {

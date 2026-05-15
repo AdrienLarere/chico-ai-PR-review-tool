@@ -17,6 +17,9 @@ function parseBlogPath(pathname) {
   if (m && VALID_SLUGS.includes(m[1])) return m[1];
   return null;
 }
+function isAdminPath(pathname) {
+  return pathname === '/admin' || pathname === '/admin/';
+}
 
 // =============== Toast Stack ===============
 function ToastStack({ toasts, dismiss }) {
@@ -77,8 +80,10 @@ function TopBar({ user, switchUser, page, setPage, blogSlug, goToBlog }) {
     ? (user.role === 'manager' ? 'queue' : 'prlist')
     : page;
 
-  // Blog pages are their own surface — no tabs, no user pill
+  // Blog and Admin pages are standalone surfaces — no tabs, no user pill
   const isBlog = page === 'blog';
+  const isAdmin = page === 'admin';
+  const hideChrome = isBlog || isAdmin;
   const currentPost = BLOG_POSTS_BY_SLUG[blogSlug] || BLOG_POSTS_BY_SLUG[DEFAULT_BLOG_SLUG];
 
   useEffect(() => {
@@ -105,7 +110,7 @@ function TopBar({ user, switchUser, page, setPage, blogSlug, goToBlog }) {
             <img src="assets/chico-bear.png" alt="chico.ai" className="chico-bear" style={{ width: 40, height: 40, display: 'block' }} />
             <div>
               <div className="t-14 w-600 text-1" style={{ lineHeight: 1.1 }}>chico.ai</div>
-              <div className="t-12 text-3" style={{ lineHeight: 1.1 }}>{isBlog ? 'Blog' : 'PR Readiness'}</div>
+              <div className="t-12 text-3" style={{ lineHeight: 1.1 }}>{isBlog ? 'Blog' : isAdmin ? 'Admin' : 'PR Readiness'}</div>
             </div>
           </button>
 
@@ -118,7 +123,7 @@ function TopBar({ user, switchUser, page, setPage, blogSlug, goToBlog }) {
               <button
                 className="user-menu-item"
                 onClick={() => {
-                  if (isBlog) setPage(user.role === 'manager' ? 'dashboard' : 'prlist');
+                  if (isBlog || isAdmin) setPage(user.role === 'manager' ? 'dashboard' : 'prlist');
                   setBrandOpen(false);
                 }}
               >
@@ -129,7 +134,25 @@ function TopBar({ user, switchUser, page, setPage, blogSlug, goToBlog }) {
                   <div className="t-14 w-500 glass-text-1" style={{ lineHeight: 1.15 }}>PR Review</div>
                   <div className="t-12 glass-text-3">The app</div>
                 </div>
-                {!isBlog && (
+                {!hideChrome && (
+                  <span className="pill pill-good"><Icon name="check" className="ic ic-sm" /></span>
+                )}
+              </button>
+              <button
+                className="user-menu-item"
+                onClick={() => {
+                  if (!isAdmin) setPage('admin');
+                  setBrandOpen(false);
+                }}
+              >
+                <div className="row center" style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(107,107,255,0.18)', color: '#6B6BFF' }}>
+                  <Icon name="chart" className="ic ic-sm" />
+                </div>
+                <div style={{ textAlign: 'left', flex: 1 }}>
+                  <div className="t-14 w-500 glass-text-1" style={{ lineHeight: 1.15 }}>Admin</div>
+                  <div className="t-12 glass-text-3">Adoption analytics</div>
+                </div>
+                {isAdmin && (
                   <span className="pill pill-good"><Icon name="check" className="ic ic-sm" /></span>
                 )}
               </button>
@@ -155,12 +178,12 @@ function TopBar({ user, switchUser, page, setPage, blogSlug, goToBlog }) {
           )}
         </div>
 
-        {!isBlog && (
+        {!hideChrome && (
           <div style={{ width: 1, height: 26, background: 'rgba(200,194,217,0.4)' }}></div>
         )}
 
         {/* Horizontal tabs */}
-        {!isBlog && (
+        {!hideChrome && (
           <nav className="row gap-6" style={{ alignItems: 'center' }}>
             {tabs.map(t => (
               <button
@@ -230,7 +253,7 @@ function TopBar({ user, switchUser, page, setPage, blogSlug, goToBlog }) {
             </div>
           )}
           {/* User pill — clickable to switch identity */}
-          {!isBlog && (
+          {!hideChrome && (
           <div ref={ref} style={{ position: 'relative' }}>
             <button
               className="user-pill"
@@ -304,17 +327,23 @@ function App() {
   // Default page per role
   const defaultPage = user.role === 'manager' ? 'dashboard' : 'prlist';
 
-  // Initial page + blog slug derived from URL
+  // Initial page derived from URL
   const initialSlugFromUrl = typeof window !== 'undefined'
     ? parseBlogPath(window.location.pathname)
     : null;
-  const [page, setPage] = useState(initialSlugFromUrl ? 'blog' : defaultPage);
+  const initialIsAdmin = typeof window !== 'undefined' && isAdminPath(window.location.pathname);
+  const [page, setPage] = useState(
+    initialSlugFromUrl ? 'blog' : initialIsAdmin ? 'admin' : defaultPage
+  );
   const [blogSlug, setBlogSlug] = useState(initialSlugFromUrl || DEFAULT_BLOG_SLUG);
   const [currentPrId, setCurrentPrId] = useState(null);
 
   // Keep the URL in sync with page + blog slug
   useEffect(() => {
-    const expected = page === 'blog' ? `/blog/${blogSlug}` : '/';
+    let expected;
+    if (page === 'blog')       expected = `/blog/${blogSlug}`;
+    else if (page === 'admin') expected = '/admin';
+    else                       expected = '/';
     if (window.location.pathname !== expected) {
       window.history.pushState(null, '', expected);
     }
@@ -324,12 +353,15 @@ function App() {
   useEffect(() => {
     function onPop() {
       const slug = parseBlogPath(window.location.pathname);
+      const adminHit = isAdminPath(window.location.pathname);
       setCurrentPrId(null);
       if (slug) {
         setBlogSlug(slug);
         setPage('blog');
+      } else if (adminHit) {
+        setPage('admin');
       } else {
-        setPage(prev => (prev === 'blog' ? defaultPage : prev));
+        setPage(prev => (prev === 'blog' || prev === 'admin' ? defaultPage : prev));
       }
     }
     window.addEventListener('popstate', onPop);
@@ -390,6 +422,7 @@ function App() {
           {page === 'prdetail'  && <window.PageReview ctx={ctx} prId={currentPrId} />}
           {page === 'roi'       && <window.PageROI ctx={ctx} />}
           {page === 'blog'      && <window.PageBlog ctx={ctx} slug={blogSlug} />}
+          {page === 'admin'     && <window.PageAdmin ctx={ctx} />}
         </div>
       </div>
       <ToastStack toasts={toasts} dismiss={dismiss} />

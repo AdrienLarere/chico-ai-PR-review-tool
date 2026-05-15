@@ -41,12 +41,43 @@ function highlight(line) {
   });
 }
 
-function CodeView({ code, file, suggestions, onSuggestionHover, focusedSugId }) {
+function CodeView({ code, file, suggestions, onSuggestionHover, focusedSugId, editable, onChange }) {
   const lines = code.split('\n');
-  // line -> suggestion id map
   const lineMap = {};
   suggestions.forEach(s => { if (s.lineHint) lineMap[s.lineHint] = s.id; });
 
+  // Editable mode: textarea with a parallel line-number gutter.
+  if (editable) {
+    return (
+      <div className="dev-code-edit">
+        <div className="code-gutter">
+          {lines.map((l, i) => {
+            const lineNum = i + 1;
+            const sugId = lineMap[lineNum];
+            return (
+              <div key={i} className={`code-line-num ${sugId ? 'has-marker' : ''}`}>
+                {sugId && (
+                  <span className="line-marker" title={`Suggestion ${sugId}`} onClick={() => onSuggestionHover && onSuggestionHover(sugId)}>
+                    {sugId}
+                  </span>
+                )}
+                <span>{lineNum}</span>
+              </div>
+            );
+          })}
+        </div>
+        <textarea
+          className="code-editor"
+          value={code}
+          onChange={(e) => onChange(e.target.value)}
+          spellCheck={false}
+          rows={Math.max(lines.length, 1)}
+        />
+      </div>
+    );
+  }
+
+  // Read-only mode: keep the original highlighted view.
   return (
     <div className="dev-code-v2">
       {lines.map((l, i) => {
@@ -71,19 +102,19 @@ function CodeView({ code, file, suggestions, onSuggestionHover, focusedSugId }) 
   );
 }
 
-function SuggestionBlock({ s, action, readOnly, onAct, onDecline, onUndo, focused, onHoverLine, cardRef, dim }) {
+function SuggestionBlock({ s, action, feedback, readOnly, onAct, onThumbsUp, onThumbsDown, onUndo, focused, onHoverLine, cardRef, dim }) {
   const sevClass = s.severity === 'High' ? 'pill-risk' : s.severity === 'Medium' ? 'pill-warn' : 'pill-neutral';
-  const status = action;
-  const stateClass = status === 'accepted' ? 'accepted' : status === 'fixed' ? 'fixed' : status === 'declined' ? 'declined' : '';
+  // Only accept / decline give the whole card a glow — thumbs feedback lives on the button itself.
+  const stateClass = action === 'accepted' ? 'accepted' : action === 'declined' ? 'declined' : '';
 
   const [sweep, setSweep] = rUS(false);
   rUE(() => {
-    if (status === 'accepted' || status === 'fixed') {
+    if (action === 'accepted') {
       setSweep(true);
       const id = setTimeout(() => setSweep(false), 900);
       return () => clearTimeout(id);
     }
-  }, [status]);
+  }, [action]);
 
   return (
     <div
@@ -106,10 +137,11 @@ function SuggestionBlock({ s, action, readOnly, onAct, onDecline, onUndo, focuse
           )}
           <span className="pill-dark">{s.category}</span>
           <span className={`pill-dark ${sevClass}`}>{s.severity}</span>
-          {status && (
-            <span className={`pill-dark ${status === 'accepted' || status === 'fixed' ? 'pill-good' : 'pill-risk'}`}>
-              {status === 'accepted' ? 'Accepted' : status === 'fixed' ? 'Marked fixed' : 'Declined'}
-            </span>
+          {action === 'accepted' && (
+            <span className="pill-dark pill-good">Accepted</span>
+          )}
+          {action === 'declined' && (
+            <span className="pill-dark pill-risk">Declined</span>
           )}
         </div>
       </div>
@@ -134,20 +166,34 @@ function SuggestionBlock({ s, action, readOnly, onAct, onDecline, onUndo, focuse
         </div>
       )}
 
-      {!readOnly && !status && (
+      {/* Action row.
+          - Accept / Decline are primary actions that lock the suggestion (card glow + Undo).
+          - Thumbs up / down are feedback; clicking does not collapse the row or show Undo. */}
+      {!readOnly && !action && (
         <div className="row gap-6 mt-20" style={{ justifyContent: 'flex-end' }}>
           <button className="btn btn-ghost-dark btn-xs" onClick={() => onAct(s, 'accepted')}>
             <Icon name="check" className="ic ic-sm" /> Accept
           </button>
-          <button className="btn btn-ghost-dark btn-xs" onClick={() => onDecline(s)}>
+          <button className="btn btn-ghost-dark btn-xs" onClick={() => onAct(s, 'declined')}>
             <Icon name="x" className="ic ic-sm" /> Decline
           </button>
-          <button className="btn btn-ghost-dark btn-xs" onClick={() => onAct(s, 'fixed')} style={{ color: '#B5B5FF', borderColor: 'rgba(107,107,255,0.34)' }}>
-            <Icon name="spark" className="ic ic-sm" /> Mark fixed
+          <button
+            className={`btn btn-ghost-dark btn-xs ${feedback === 'thumbs_up' ? 'thumb-up-active' : ''}`}
+            onClick={() => onThumbsUp(s)}
+            title="This suggestion was good"
+          >
+            <Icon name="thumbsUp" className="ic ic-sm" />
+          </button>
+          <button
+            className={`btn btn-ghost-dark btn-xs ${feedback === 'thumbs_down' ? 'thumb-down-active' : ''}`}
+            onClick={() => onThumbsDown(s)}
+            title="This suggestion was not good"
+          >
+            <Icon name="thumbsDown" className="ic ic-sm" />
           </button>
         </div>
       )}
-      {!readOnly && status && (
+      {!readOnly && action && (
         <div className="row gap-6 mt-20" style={{ justifyContent: 'flex-end' }}>
           <button className="btn btn-ghost-dark btn-xs" onClick={() => onUndo && onUndo(s)}>
             <Icon name="refresh" className="ic ic-sm" /> Undo
@@ -158,26 +204,134 @@ function SuggestionBlock({ s, action, readOnly, onAct, onDecline, onUndo, focuse
   );
 }
 
-function DeclineModal({ s, onCancel, onConfirm }) {
-  const [reason, setReason] = rUS('Not relevant');
-  const options = ['Not relevant', 'Already handled', 'Too risky', 'Will handle later'];
+function ThumbsDownModal({ s, onCancel, onConfirm }) {
+  const [reason, setReason] = rUS(null);
+  const [details, setDetails] = rUS('');
+  const reasons = ['Incorrect', 'Not applicable to my code', 'Already handled elsewhere', 'Hallucinated reference', 'Too vague', 'Wrong file or line'];
   return (
     <div className="modal-backdrop" onClick={onCancel}>
-      <div className="glass p-24 bounce-in" style={{ maxWidth: 460, width: '100%' }} onClick={e => e.stopPropagation()}>
-        <div className="t-12 glass-text-3 uppercase mb-8">Decline suggestion</div>
+      <div className="glass p-24 bounce-in" style={{ maxWidth: 500, width: '100%' }} onClick={e => e.stopPropagation()}>
+        <div className="t-12 glass-text-3 uppercase mb-8">What was wrong with this suggestion?</div>
         <div className="t-20 glass-text-1">{s.title}</div>
-        <div className="t-12 glass-text-3 mt-4">Pick a reason — it shows up in the audit trail.</div>
-        <div className="col gap-8 mt-16">
-          {options.map(o => (
-            <label key={o} className="row gap-10" style={{ padding: '10px 12px', borderRadius: 10, background: reason === o ? 'rgba(107,107,255,0.18)' : 'rgba(255,255,255,0.04)', border: '1px solid', borderColor: reason === o ? 'rgba(107,107,255,0.42)' : 'rgba(180,170,230,0.12)', cursor: 'pointer' }}>
-              <input type="radio" name="reason" value={o} checked={reason === o} onChange={() => setReason(o)} style={{ accentColor: '#6B6BFF' }} />
-              <span className="t-14 glass-text-1">{o}</span>
-            </label>
+        <div className="t-12 glass-text-3 mt-4">Optional. Helps us improve the model.</div>
+
+        <div className="col gap-6 mt-16">
+          {reasons.map(r => (
+            <button
+              key={r}
+              type="button"
+              onClick={() => setReason(reason === r ? null : r)}
+              style={{
+                textAlign: 'left',
+                padding: '10px 12px',
+                borderRadius: 10,
+                background: reason === r ? 'rgba(217,107,122,0.18)' : 'rgba(255,255,255,0.04)',
+                border: '1px solid',
+                borderColor: reason === r ? 'rgba(217,107,122,0.45)' : 'rgba(180,170,230,0.12)',
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+                fontSize: 13.5,
+                color: 'var(--dtext-1)',
+              }}
+            >
+              {r}
+            </button>
           ))}
         </div>
+
+        <div className="mt-16">
+          <div className="t-12 glass-text-3 uppercase mb-6">More details (optional)</div>
+          <textarea
+            value={details}
+            onChange={(e) => setDetails(e.target.value)}
+            placeholder="Anything specific we should know…"
+            rows={3}
+            style={{
+              width: '100%',
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(180,170,230,0.18)',
+              borderRadius: 10,
+              padding: '10px 12px',
+              color: 'var(--dtext-1)',
+              fontFamily: 'inherit',
+              fontSize: 13,
+              resize: 'vertical',
+              outline: 'none',
+            }}
+          />
+        </div>
+
         <div className="row gap-10 mt-20" style={{ justifyContent: 'flex-end' }}>
           <button className="btn btn-ghost-dark" onClick={onCancel}>Cancel</button>
-          <button className="btn btn-primary" onClick={() => onConfirm(reason)}>Decline suggestion</button>
+          <button className="btn btn-primary" onClick={() => onConfirm({ reason, details })}>Send feedback</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function NPSModal({ pr, onCancel, onSubmit }) {
+  const QUESTIONS = [
+    { id: 'overall', label: 'Overall, how was your experience with PR Readiness?' },
+    { id: 'quality', label: 'How useful were the AI suggestions?' },
+    { id: 'repeat',  label: 'Would you use it again on your next PR?' },
+  ];
+  const SCALE = ['Great', 'Decent', 'Neutral', 'Mediocre', 'Horrible'];
+  const [text, setText] = rUS('');
+  const [answers, setAnswers] = rUS({});
+
+  return (
+    <div className="modal-backdrop" onClick={onCancel}>
+      <div className="glass p-24 bounce-in" style={{ maxWidth: 680, width: '100%', maxHeight: '88vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
+        <div className="t-12 glass-text-3 uppercase mb-8">Quick feedback</div>
+        <div className="t-20 glass-text-1">How was your experience?</div>
+        <div className="t-12 glass-text-3 mt-4">Three short questions. Skip any of them — submitting always works.</div>
+
+        <div className="col gap-18 mt-20">
+          {QUESTIONS.map(q => (
+            <div key={q.id}>
+              <div className="glass-text-1 mb-8" style={{ lineHeight: 1.45, fontSize: 13.5 }}>{q.label}</div>
+              <div className="nps-scale nps-scale-5">
+                {SCALE.map(s => (
+                  <button
+                    key={s}
+                    type="button"
+                    className={`nps-pill ${answers[q.id] === s ? 'selected' : ''}`}
+                    onClick={() => setAnswers({ ...answers, [q.id]: s })}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-20">
+          <div className="t-12 glass-text-3 uppercase mb-6">Anything you'd like to share (optional)</div>
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="A sentence or two about your experience…"
+            rows={3}
+            style={{
+              width: '100%',
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(180,170,230,0.18)',
+              borderRadius: 10,
+              padding: '10px 12px',
+              color: 'var(--dtext-1)',
+              fontFamily: 'inherit',
+              fontSize: 13,
+              resize: 'vertical',
+              outline: 'none',
+            }}
+          />
+        </div>
+
+        <div className="row gap-10 mt-24" style={{ justifyContent: 'flex-end' }}>
+          <button className="btn btn-ghost-dark" onClick={onCancel}>Skip</button>
+          <button className="btn btn-primary" onClick={() => onSubmit({ text, answers })}>Submit feedback</button>
         </div>
       </div>
     </div>
@@ -220,13 +374,21 @@ const PageReview = ({ ctx, prId }) => {
   const readOnly = ctx.user.role === 'manager';
 
   const [activeFile, setActiveFile] = rUS(files[0]?.name || '');
-  const [declineFor, setDeclineFor] = rUS(null);
+  const [thumbsDownFor, setThumbsDownFor] = rUS(null);
   const [showClaude, setShowClaude] = rUS(false);
+  const [showNPS, setShowNPS] = rUS(false);
   const [hoveredLine, setHoveredLine] = rUS(null);
+  // Editable code: a draft for the active file. null means "no unsaved edits".
+  const [editDraft, setEditDraft] = rUS(null);
+  rUE(() => { setEditDraft(null); }, [activeFile, id]);
+  // Once review is requested, lock the button until the user navigates away.
+  const [reviewRequested, setReviewRequested] = rUS(false);
+  rUE(() => { setReviewRequested(false); }, [id]);
 
   // Score state: interactive only for PR#184
   const score = isInteractive ? ctx.pr184.score : pr.score;
   const actions = isInteractive ? ctx.pr184.actions : {};
+  const feedback = isInteractive ? (ctx.pr184.feedback || {}) : {};
 
   const [scoreDisplay, setScoreDisplay] = rUS(score);
   const [scoreBounce, setScoreBounce] = rUS(false);
@@ -244,19 +406,18 @@ const PageReview = ({ ctx, prId }) => {
     if (!isInteractive || readOnly) return;
     if (actions[s.id]) return;
     const delta = window.SCORE_DELTAS[s.severity];
-    const inc = kind === 'fixed' ? delta.fix : kind === 'accepted' ? delta.accept : 0;
+    const inc = kind === 'accepted' ? delta.accept : 0; // decline = 0 score change
     const newScore = Math.min(100, score + inc);
 
-    // Apply code patch if defined
-    const patch = window.SUGGESTION_PATCHES[id] && window.SUGGESTION_PATCHES[id][s.id];
+    // Apply the code patch only on accept.
+    const patch = kind === 'accepted' && window.SUGGESTION_PATCHES[id] && window.SUGGESTION_PATCHES[id][s.id];
 
     ctx.setPr184(prev => {
       const nextOverrides = { ...(prev.fileOverrides || {}) };
-      // Snapshot for undo: capture pre-action file content (if patched) and the score delta actually applied
       const snapshot = { scoreDelta: newScore - prev.score };
       if (patch) {
         snapshot.file = patch.file;
-        snapshot.prevFileContent = nextOverrides[patch.file]; // undefined means "no override yet"
+        snapshot.prevFileContent = nextOverrides[patch.file];
         const currentCode = nextOverrides[patch.file] !== undefined
           ? nextOverrides[patch.file]
           : (window.PR_FILES[id].find(f => f.name === patch.file)?.code || '');
@@ -271,30 +432,62 @@ const PageReview = ({ ctx, prId }) => {
       };
     });
 
-    // Auto-focus the file the patch touched
     if (patch && patch.file !== activeFile) setActiveFile(patch.file);
 
-    ctx.pushToast(
-      kind === 'fixed' ? 'Suggestion marked fixed' : 'Suggestion accepted and logged',
-      inc > 0 ? `Readiness improved from ${score} to ${newScore}` : 'Manager view updated',
-    );
-    if (newScore >= 90 && score < 90) {
-      setTimeout(() => ctx.pushToast('Ready for human review', 'This PR is now likely to pass review with fewer cycles.'), 600);
+    if (kind === 'accepted') {
+      ctx.pushToast(
+        'Suggestion accepted',
+        inc > 0 ? `Readiness improved from ${score} to ${newScore}` : 'Logged.',
+      );
+      if (newScore >= 90 && score < 90) {
+        setTimeout(() => ctx.pushToast('Ready for human review', 'This PR is now likely to pass review with fewer cycles.'), 600);
+      }
+    } else if (kind === 'declined') {
+      ctx.pushToast('Suggestion declined', 'Logged.');
     }
   };
-  const decline = (s) => setDeclineFor(s);
-  const confirmDecline = (reason) => {
-    if (!isInteractive || readOnly) { setDeclineFor(null); return; }
-    const s = declineFor;
+
+  // Thumbs are feedback (separate from primary action). They toggle independently
+  // and never collapse the action row or trigger Undo.
+  const thumbsUp = (s) => {
+    if (!isInteractive || readOnly) return;
+    ctx.setPr184(prev => {
+      const current = (prev.feedback || {})[s.id];
+      const nextFeedback = { ...(prev.feedback || {}) };
+      const nextThumbsDownFeedback = { ...(prev.thumbsDownFeedback || {}) };
+      if (current === 'thumbs_up') {
+        delete nextFeedback[s.id];
+      } else {
+        nextFeedback[s.id] = 'thumbs_up';
+        delete nextThumbsDownFeedback[s.id];
+      }
+      return { ...prev, feedback: nextFeedback, thumbsDownFeedback: nextThumbsDownFeedback };
+    });
+  };
+  const thumbsDown = (s) => {
+    if (!isInteractive || readOnly) return;
+    const current = (ctx.pr184.feedback || {})[s.id];
+    if (current === 'thumbs_down') {
+      // Already active — toggle off without opening the modal.
+      ctx.setPr184(prev => {
+        const nextFeedback = { ...(prev.feedback || {}) }; delete nextFeedback[s.id];
+        const nextThumbsDownFeedback = { ...(prev.thumbsDownFeedback || {}) }; delete nextThumbsDownFeedback[s.id];
+        return { ...prev, feedback: nextFeedback, thumbsDownFeedback: nextThumbsDownFeedback };
+      });
+      return;
+    }
+    setThumbsDownFor(s);
+  };
+  const confirmThumbsDown = ({ reason, details }) => {
+    if (!isInteractive || readOnly) { setThumbsDownFor(null); return; }
+    const s = thumbsDownFor;
     ctx.setPr184(prev => ({
       ...prev,
-      actions: { ...prev.actions, [s.id]: 'declined' },
-      declineReasons: { ...prev.declineReasons, [s.id]: reason },
-      // Declining has no score or file change, but we still record an entry so undo works uniformly
-      undoStore: { ...(prev.undoStore || {}), [s.id]: { scoreDelta: 0 } },
+      feedback: { ...(prev.feedback || {}), [s.id]: 'thumbs_down' },
+      thumbsDownFeedback: { ...(prev.thumbsDownFeedback || {}), [s.id]: { reason, details } },
     }));
-    setDeclineFor(null);
-    ctx.pushToast('Suggestion declined', `Reason: ${reason} · Manager view updated.`);
+    setThumbsDownFor(null);
+    ctx.pushToast('Feedback sent', 'Thanks — that helps us improve.');
   };
   const undo = (s) => {
     if (!isInteractive || readOnly) return;
@@ -303,7 +496,6 @@ const PageReview = ({ ctx, prId }) => {
       const prevAction = prev.actions[s.id];
       if (!snap && !prevAction) return prev;
       const nextActions = { ...prev.actions }; delete nextActions[s.id];
-      const nextDeclineReasons = { ...(prev.declineReasons || {}) }; delete nextDeclineReasons[s.id];
       const nextOverrides = { ...(prev.fileOverrides || {}) };
       if (snap && snap.file !== undefined) {
         if (snap.prevFileContent === undefined) {
@@ -314,16 +506,56 @@ const PageReview = ({ ctx, prId }) => {
       }
       const nextUndoStore = { ...(prev.undoStore || {}) }; delete nextUndoStore[s.id];
       const newScore = Math.max(0, prev.score - ((snap && snap.scoreDelta) || 0));
+      // Feedback (thumbs) is independent of the primary action and persists across undo.
       return {
         ...prev,
         actions: nextActions,
         score: newScore,
         fileOverrides: nextOverrides,
-        declineReasons: nextDeclineReasons,
         undoStore: nextUndoStore,
       };
     });
     ctx.pushToast('Action undone', 'Suggestion is back to pending.');
+  };
+
+  // ---- Code editing (left panel) ----
+  const baseFile = files.find(f => f.name === activeFile);
+  const baseCode = isInteractive
+    ? (ctx.pr184.fileOverrides?.[activeFile] ?? baseFile?.code ?? '')
+    : (baseFile?.code ?? '');
+  const displayCode = editDraft !== null ? editDraft : baseCode;
+  const hasEdits = editDraft !== null && editDraft !== baseCode;
+
+  const handleEdit = (newCode) => setEditDraft(newCode);
+  const handleSave = () => {
+    if (!isInteractive || readOnly || editDraft === null) return;
+    ctx.setPr184(prev => ({
+      ...prev,
+      fileOverrides: { ...(prev.fileOverrides || {}), [activeFile]: editDraft },
+    }));
+    setEditDraft(null);
+    ctx.pushToast('File saved', `${activeFile.split('/').pop()} updated.`);
+  };
+
+  // ---- Request review (with NPS trigger for PR 176) ----
+  const requestReview = () => {
+    if (reviewRequested) return;
+    if (id === 176) {
+      setShowNPS(true);
+    } else {
+      setReviewRequested(true);
+      ctx.pushToast('Human review requested', `Reviewers on ${pr.team} have been notified.`);
+    }
+  };
+  const submitNPS = ({ text, answers }) => {
+    setShowNPS(false);
+    setReviewRequested(true);
+    ctx.pushToast('Thanks for the feedback', `Review requested. ${Object.keys(answers).length} answer${Object.keys(answers).length === 1 ? '' : 's'} logged.`);
+  };
+  const skipNPS = () => {
+    setShowNPS(false);
+    setReviewRequested(true);
+    ctx.pushToast('Human review requested', `Reviewers on ${pr.team} have been notified.`);
   };
 
   // Suggestions for active file (with synthetic statuses for non-interactive PRs)
@@ -333,7 +565,7 @@ const PageReview = ({ ctx, prId }) => {
 
   const allCount = staticSugs.length;
   const accCount = isInteractive
-    ? Object.values(actions).filter(v => v === 'accepted' || v === 'fixed').length
+    ? Object.values(actions).filter(v => v === 'accepted').length
     : staticSugs.filter(s => getAction(s)).length;
 
   return (
@@ -381,8 +613,8 @@ const PageReview = ({ ctx, prId }) => {
                 <Icon name="check" className="ic ic-sm" /> Approve
               </button>
             ) : (
-              <button className="btn btn-primary btn-sm" disabled={!isReady} onClick={() => ctx.pushToast('Human review requested', `Reviewers on ${pr.team} have been notified.`)}>
-                <Icon name="user" className="ic ic-sm" /> Request review
+              <button className="btn btn-primary btn-sm" disabled={!isReady || reviewRequested} onClick={requestReview}>
+                <Icon name="user" className="ic ic-sm" /> {reviewRequested ? 'Review requested' : 'Request review'}
               </button>
             )}
           </div>
@@ -414,29 +646,41 @@ const PageReview = ({ ctx, prId }) => {
 
           {/* code */}
           <div className="pillow-inset" style={{ borderRadius: 14, overflow: 'hidden' }}>
-            {(() => {
-              const f = files.find(x => x.name === activeFile);
-              if (!f) return null;
-              const overrides = ctx.pr184.fileOverrides || {};
-              const code = isInteractive && overrides[activeFile] !== undefined ? overrides[activeFile] : f.code;
-              if (f.isDescription) {
-                return (
-                  <div style={{ padding: '18px 22px', fontSize: 14, lineHeight: 1.65, color: 'var(--text-1)', whiteSpace: 'pre-wrap' }}>
-                    {code}
-                  </div>
-                );
-              }
-              return (
-                <CodeView
-                  code={code}
-                  file={f.name}
-                  suggestions={fileSugs}
-                  onSuggestionHover={(sid) => setHoveredLine(sid)}
-                  focusedSugId={hoveredLine}
+            {baseFile && baseFile.isDescription ? (
+              isInteractive && !readOnly ? (
+                <textarea
+                  className="desc-editor"
+                  value={displayCode}
+                  onChange={(e) => handleEdit(e.target.value)}
+                  rows={Math.max(displayCode.split('\n').length, 3)}
+                  spellCheck={false}
                 />
-              );
-            })()}
+              ) : (
+                <div style={{ padding: '18px 22px', fontSize: 14, lineHeight: 1.65, color: 'var(--text-1)', whiteSpace: 'pre-wrap' }}>
+                  {displayCode}
+                </div>
+              )
+            ) : baseFile ? (
+              <CodeView
+                code={displayCode}
+                file={baseFile.name}
+                suggestions={fileSugs}
+                onSuggestionHover={(sid) => setHoveredLine(sid)}
+                focusedSugId={hoveredLine}
+                editable={isInteractive && !readOnly}
+                onChange={handleEdit}
+              />
+            ) : null}
           </div>
+
+          {/* Save button — only when there are unsaved edits */}
+          {hasEdits && (
+            <div className="row mt-12" style={{ justifyContent: 'flex-end' }}>
+              <button className="btn-save" onClick={handleSave}>
+                <Icon name="save" className="ic ic-sm" /> Save
+              </button>
+            </div>
+          )}
         </div>
 
         {/* RIGHT — suggestions for current file */}
@@ -483,9 +727,11 @@ const PageReview = ({ ctx, prId }) => {
                     key={s.id}
                     s={s}
                     action={getAction(s)}
+                    feedback={feedback[s.id]}
                     readOnly={readOnly || !isInteractive}
                     onAct={act}
-                    onDecline={decline}
+                    onThumbsUp={thumbsUp}
+                    onThumbsDown={thumbsDown}
                     onUndo={undo}
                     onHoverLine={setHoveredLine}
                     focused={hoveredLine === s.id}
@@ -508,7 +754,9 @@ const PageReview = ({ ctx, prId }) => {
                   This PR is likely to pass review with fewer cycles.
                 </div>
                 <div className="row gap-8 mt-10 wrap">
-                  <button className="btn btn-primary btn-xs" onClick={() => ctx.pushToast('Human review requested', `Reviewers on ${pr.team} have been notified.`)}>Request review</button>
+                  <button className="btn btn-primary btn-xs" disabled={reviewRequested} onClick={requestReview}>
+                    {reviewRequested ? 'Review requested' : 'Request review'}
+                  </button>
                   <button className="btn btn-ghost-dark btn-xs" onClick={() => setShowClaude(true)}><Icon name="code" className="ic ic-sm" /> Claude Code</button>
                 </div>
               </div>
@@ -517,8 +765,9 @@ const PageReview = ({ ctx, prId }) => {
         </div>
       </div>
 
-      {declineFor && <DeclineModal s={declineFor} onCancel={() => setDeclineFor(null)} onConfirm={confirmDecline} />}
+      {thumbsDownFor && <ThumbsDownModal s={thumbsDownFor} onCancel={() => setThumbsDownFor(null)} onConfirm={confirmThumbsDown} />}
       {showClaude && <ClaudeModal pr={pr} onClose={() => setShowClaude(false)} />}
+      {showNPS && <NPSModal pr={pr} onCancel={skipNPS} onSubmit={submitNPS} />}
     </div>
   );
 };

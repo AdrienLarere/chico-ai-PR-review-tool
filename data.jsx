@@ -206,6 +206,9 @@ window.Icon = function Icon({ name, className, style }) {
     plus:      <><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></>,
     settings:  <><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></>,
     monogram:  <><path d="M12 3a9 9 0 1 0 9 9"/><circle cx="12" cy="12" r="3" /></>,
+    thumbsUp:  <><path d="M7 22V11"/><path d="M7 11h-3a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3"/><path d="M7 11l4-8a3 3 0 0 1 3 3v3h5.28a2 2 0 0 1 2 2.3l-1.38 9a2 2 0 0 1-2 1.7H7"/></>,
+    thumbsDown:<><path d="M17 2v11"/><path d="M17 13h3a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-3"/><path d="M17 13l-4 8a3 3 0 0 1-3-3v-3H4.72a2 2 0 0 1-2-2.3l1.38-9a2 2 0 0 1 2-1.7H17"/></>,
+    save:      <><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></>,
   };
   return (
     <svg className={cls} style={style} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -655,10 +658,10 @@ window.PAYMENTS_TEAM_MEMBERS = [
   },
   {
     id: 'jordan', name: 'Jordan Park', role: 'Staff Engineer', initials: 'JP',
-    prsThisSprint: 3, currentReadiness: 0, avgApproval: 13, suggestionsActedOn: 0,
+    prsThisSprint: 3, currentReadiness: 0, avgApproval: 17, suggestionsActedOn: 0,
     readinessHistory: [0, 0, 0, 0, 0, 0],
-    approvalHistory:  [14, 14, 13, 13, 13, 13],
-    note: 'Hasn\'t adopted readiness yet — approval time mostly unchanged.',
+    approvalHistory:  [13, 14, 14, 15, 16, 17],
+    note: 'Hasn\'t adopted readiness yet — approval time slowly drifting up.',
   },
   {
     id: 'carlos', name: 'Carlos Reyes', role: 'Engineer', initials: 'CR',
@@ -667,6 +670,35 @@ window.PAYMENTS_TEAM_MEMBERS = [
     approvalHistory:  [13, 12, 12, 11, 11, 10],
     note: 'Inconsistent AI use — readiness scores swing sprint to sprint; approval time trending slightly down.',
   },
+];
+
+// =============== Admin (internal product analytics) ===============
+window.ADMIN_METRICS = [
+  { id: 'acceptance', label: 'Suggestion acceptance rate', value: 64, suffix: '%', trend: +8,  tone: 'good',
+    sub: 'of surfaced suggestions are accepted or marked fixed' },
+  { id: 'repeat',     label: 'Repeat usage on next PR',    value: 78, suffix: '%', trend: +12, tone: 'good',
+    sub: 'of developers who used readiness once come back on their next PR' },
+  { id: 'nps',        label: 'NPS after repeated use',      value: 42, suffix: '',  trend: +6,  tone: 'good',
+    sub: 'survey responses after a developer\'s third PR' },
+  { id: 'thumbsUp',   label: 'Thumbs up',                   value: 76, suffix: '%', trend: +9,  tone: 'good',
+    sub: 'of rated suggestions get a 👍' },
+  { id: 'thumbsDown', label: 'Thumbs down',                 value: 8,  suffix: '%', trend: -3,  tone: 'good',
+    sub: 'of rated suggestions get a 👎 — trending down' },
+];
+
+window.ADMIN_HISTORY = {
+  acceptance: [42, 48, 53, 57, 60, 64],
+  repeat:     [55, 60, 65, 71, 75, 78],
+  nps:        [22, 26, 31, 36, 39, 42],
+  thumbsUp:   [58, 63, 68, 71, 73, 76],
+  thumbsDown: [16, 14, 12, 11,  9,  8],
+};
+
+window.ADMIN_BY_TEAM = [
+  { team: 'Payments',  acceptance: 74, repeat: 88, nps: 58, thumbsUp: 82, thumbsDown: 5 },
+  { team: 'Growth',    acceptance: 62, repeat: 76, nps: 41, thumbsUp: 74, thumbsDown: 7 },
+  { team: 'Platform',  acceptance: 38, repeat: 52, nps: 18, thumbsUp: 60, thumbsDown: 14 },
+  { team: 'Data',      acceptance: 41, repeat: 58, nps: 22, thumbsUp: 64, thumbsDown: 11 },
 ];
 
 // =============== Users ===============

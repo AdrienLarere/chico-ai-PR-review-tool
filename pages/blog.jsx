@@ -106,10 +106,22 @@ function PostPresentation({ ctx }) {
         <li>PR base Readiness score is currently arbitrary. A lot of the numbers on the app are made up to bring the feature to life.</li>
         <li>The tool adds an extra step to the workflow that might feel clunky and frustrating to developers. This is a known problem for analytics tools.</li>
         <li>
-          PR Approval time might be an untrustworthy metric: maybe you ship code faster, but it is worse. This is a common problem with easy-to-track metrics. Potential solutions include
+          PR Approval time might be an untrustworthy metric: maybe you ship code faster, but it is worse. This is a common problem with easy-to-track metrics. <br/>I also make the assumption that code quality is the bottleneck for PR approval; it might not. Managers could be busy, understaffed, approving everything after X hours regardless of the code...<br/> Potential solutions include:
           <ul>
             <li>Another AI rating the quality of outputted code</li>
             <li>A human + AI review of the outputted code; done using the time saved by the reduced PR approval time.</li>
+            <li>Supporting metrics:
+              <ul>
+                <li>Time from first review to approval: Once a human has looked at the PR, how much back-and-forth remains?<br/>This gets rid of the time between submission and review, which is not changed by AI use.</li>
+                <li>Number of requested changes: Track how often reviewers request changes, and how many changes are requested.</li>
+              </ul>
+            </li>
+            <li>Guardrail metrics:
+              <ul>
+                <li>No increase in bugs in the code (needs a baseline to make sense)</li>
+                <li>No increase in customer tickets/complains</li>
+              </ul>
+            </li>
           </ul>
         </li>
       </ul>
@@ -117,11 +129,15 @@ function PostPresentation({ ctx }) {
       <hr />
 
       <h2>How do we scale this in 3/6/12 months? How do we measure success?</h2>
+      <p>Our users will use Claude Code, Codex, or Gemini Code Assist. Our job is to make them stick. For engineering, that means adding a readiness layer around the coding workflow. If a developer uses Claude Code, Chico can run in the terminal before the PR. If they use Codex, Chico can run as a CLI workflow or evaluate the PR Codex creates. If they use Gemini, Chico can start in GitHub and later move into the IDE. The common layer is GitHub: every code path eventually becomes a PR, and that is where Chico can measure whether AI-assisted work is actually producing faster, cleaner reviews.</p>
       <ul>
-        <li>3 months: pilot with 3 to 5 engineering teams</li>
-        <li>6 months: prove adoption and review-cycle improvement</li>
-        <li>12 months: expand to more workflows, such as sales calls, support tickets, finance reports</li>
+        <li>3 months: proof that Readiness works for PRs. Various teams over various companies use the PR readiness product. We iterate, improve, and start building versions for other review-heavy workflows.</li>
+        <li>6 months: proof that the Readiness pattern works in other review-heavy workflows like sales calls and claims. We iterate, improve, and start building the product for different roles and workflows.</li>
+        <li>12 months: Chico should become the layer that helps enterprises turn AI from generic licences into role-specific workflows, then measure whether those workflows actually change business outcomes.</li>
       </ul>
+      <p>
+        <a href="/blog/expanding" onClick={openExpanding} className="prose-link">The scale programme</a>.
+      </p>
     </>
   );
 }
@@ -130,112 +146,190 @@ function PostExpanding() {
   return (
     <>
       <p className="lead">
-        PR Readiness is one shape of a more general motion: give a person a scored, fixable preview of their work before a reviewer has to react to it. The same loop fits a much wider set of work products and a much wider set of industries.
+        PR Readiness is the first version of a bigger idea: help people check the quality of their work before someone else has to review it. The product is not really about pull requests. It is about the moment before review, when a small fix can save a lot of back-and-forth.
       </p>
       <hr />
 
       <h2>What "readiness" actually means</h2>
       <p>
-        A readiness score answers a single question: <strong>if a reviewer were to look at this right now, what would they probably say?</strong> The system scores the artifact, surfaces specific suggestions, and offers a one-click path to apply them. The pre-review loop closes faster, and the reviewer sees a cleaner artifact when they finally arrive.
+        A readiness check answers a simple question: <strong>if the next person in the workflow looked at this now, what would they probably push back on?</strong> The system looks at the work, compares it against the team&apos;s standards, surfaces the likely issues, and helps the user fix them before they send it on.
       </p>
       <p>
-        Nothing about that loop is specific to pull requests. The artifact changes; the loop is invariant.
+        That loop is not specific to engineering. The artifact changes, but the pattern to fix stays the same: someone produces work, someone else reviews it, and review cycles slow the business down.
       </p>
 
-      <h2>Where else this can apply</h2>
+      <h2>The first 3 months: prove it inside GitHub</h2>
       <p>
-        The same loop fits a wide range of work products. Below is a non-exhaustive list — for each, the format is the same: who does the work, where in their flow the readiness check sits, what the AI surfaces, the metric a manager would actually pull on, and the comparative story that makes adoption legible.
+        If this shipped tomorrow, I would not spend three months validating it in a separate dashboard. I would get a basic GitHub integration live quickly and test it with real engineering teams. The product needs to appear where developers already are: inside the pull request, before review starts.
       </p>
-
-      <h3>1. Sales calls</h3>
-      <ul>
-        <li><strong>Worker</strong> — account executives and relationship managers.</li>
-        <li><strong>Workflow</strong> — sales call → AI call review → follow-up → next step booked.</li>
-        <li><strong>AI helps with</strong> — missed questions, objection handling, follow-up quality.</li>
-        <li><strong>ROI metric</strong> — next-step rate, conversion rate, deal progression.</li>
-        <li><strong>Manager pull</strong> — compare teams with higher AI coaching usage against pipeline movement.</li>
-      </ul>
-
-      <h3>2. Customer support tickets</h3>
-      <ul>
-        <li><strong>Worker</strong> — support agents.</li>
-        <li><strong>Workflow</strong> — ticket response drafted → AI quality check → customer reply → resolution.</li>
-        <li><strong>AI helps with</strong> — tone, completeness, policy accuracy, escalation detection.</li>
-        <li><strong>ROI metric</strong> — first-contact resolution, response time, CSAT, escalation rate.</li>
-        <li><strong>Manager pull</strong> — show that teams using AI checks resolve faster with fewer escalations.</li>
-      </ul>
-
-      <h3>3. Finance reporting packs</h3>
-      <ul>
-        <li><strong>Worker</strong> — finance analysts.</li>
-        <li><strong>Workflow</strong> — monthly report → AI commentary review → manager review → exec pack.</li>
-        <li><strong>AI helps with</strong> — variance explanations, unclear commentary, missing drivers.</li>
-        <li><strong>ROI metric</strong> — reporting turnaround time, review cycles, corrections needed.</li>
-        <li><strong>Manager pull</strong> — compare finance teams on close-and-report cycle time.</li>
-      </ul>
-
-      <h3>4. Consulting deliverables</h3>
-      <ul>
-        <li><strong>Worker</strong> — consultants and associates.</li>
-        <li><strong>Workflow</strong> — draft client update → AI readiness review → manager / partner review → client send.</li>
-        <li><strong>AI helps with</strong> — clarity, structure, missing evidence, weak recommendations.</li>
-        <li><strong>ROI metric</strong> — review cycles, time to client-ready version, partner edits.</li>
-        <li><strong>Manager pull</strong> — show that teams using readiness produce client-ready drafts faster.</li>
-      </ul>
-
-      <h3>5. RFP and proposal responses</h3>
-      <ul>
-        <li><strong>Worker</strong> — bid managers, sales engineers, consultants.</li>
-        <li><strong>Workflow</strong> — draft response → AI completeness check → review → submission.</li>
-        <li><strong>AI helps with</strong> — unanswered requirements, weak proof points, inconsistent language.</li>
-        <li><strong>ROI metric</strong> — proposal turnaround time, compliance score, win rate over time.</li>
-        <li><strong>Manager pull</strong> — compare adopting teams on submission speed and quality.</li>
-      </ul>
-
-      <h3>6. Product specs and tickets</h3>
-      <ul>
-        <li><strong>Worker</strong> — product managers.</li>
-        <li><strong>Workflow</strong> — PRD or ticket draft → AI readiness check → engineering review → build starts.</li>
-        <li><strong>AI helps with</strong> — unclear requirements, missing edge cases, weak acceptance criteria.</li>
-        <li><strong>ROI metric</strong> — rework, clarification cycles, time from spec to build start.</li>
-        <li><strong>Manager pull</strong> — show that AI spec checks reduce engineering back-and-forth.</li>
-      </ul>
-
-      <h3>7. Audit workpapers</h3>
-      <ul>
-        <li><strong>Worker</strong> — audit associates.</li>
-        <li><strong>Workflow</strong> — workpaper draft → AI completeness check → senior review → sign-off.</li>
-        <li><strong>AI helps with</strong> — missing evidence, unclear rationale, unsupported conclusions.</li>
-        <li><strong>ROI metric</strong> — review notes, time to sign-off, rework rate.</li>
-        <li><strong>Manager pull</strong> — compare audit teams on review-note volume and sign-off speed.</li>
-      </ul>
-
-      <h3>8. Claims review</h3>
-      <ul>
-        <li><strong>Worker</strong> — claims analysts.</li>
-        <li><strong>Workflow</strong> — claim assessment → AI completeness / risk check → approval or escalation.</li>
-        <li><strong>AI helps with</strong> — missing documents, inconsistent facts, escalation triggers.</li>
-        <li><strong>ROI metric</strong> — claim handling time, rework, escalation accuracy.</li>
-        <li><strong>Manager pull</strong> — show that AI checks close claims faster without quality loss.</li>
-      </ul>
-
-      <h2>Across segments</h2>
       <p>
-        The engine is industry-agnostic; the readiness rubric is not. The interesting work is in shaping the rubric per segment — and that's exactly what the AI lead at each company is positioned to do.
+        To be precise, I would not assume we can redesign GitHub&apos;s native PR flow. The realistic first version is a GitHub App or check that runs when a PR is opened or updated, then posts the readiness result back into the PR. That is still enough to test the product properly, because the feedback appears in the place where the developer and reviewer are already working.
+      </p>
+      <p>
+        The first version would check a PR against a simple readiness rubric: is the description clear, are the risky files explained, are tests mentioned, are edge cases covered, and are there obvious review blockers? The goal is not to replace the reviewer. The goal is to remove the comments that should never have needed a human reviewer in the first place.
+      </p>
+      <p>
+        For the first 3 months, I would measure whether PRs using Readiness move faster and create fewer avoidable review loops. The key metrics would be time from PR open to merge, number of review rounds, number of basic clarification comments, and developer sentiment. If the trend is weak, we change the rubric, the timing, or the UX. If the trend is positive, we do not over-polish the engineering use case. We take the learning and expand.
+      </p>
+
+      <h2>The next 3 months: turn Readiness into a vertical</h2>
+      <p>
+        Once we have evidence that the loop works in engineering, the next step is to test whether the same product shape works in other teams. I would pick workflows that have the same structure as PR review: a person creates something, a reviewer checks it, and quality problems create expensive back-and-forth.
+      </p>
+
+      <h3>1. Sales call readiness</h3>
+      <p>
+        This would be for account executives and relationship managers who need to turn customer conversations into strong follow-ups. After a call, the product would review the transcript and ask: did we capture the customer&apos;s pain, did we handle objections, did we agree a clear next step, and is the follow-up email strong enough to move the deal forward?
       </p>
       <ul>
-        <li><strong>Finance</strong> — risk language, regulatory citations, audit trails, control attestations.</li>
-        <li><strong>Professional services</strong> — scope clarity, deliverable framing, conflict checks, engagement-letter alignment.</li>
-        <li><strong>Retail</strong> — vendor terms, margin assumptions, seasonality, inventory exposure.</li>
-        <li><strong>Healthcare</strong> — privacy guardrails, evidence grade, payer alignment, clinical-pathway adherence.</li>
+        <li><strong>Where it sits</strong> — after a sales call, before the rep sends the follow-up.</li>
+        <li><strong>What it improves</strong> — missed objections, vague next steps, weak follow-up emails, and inconsistent sales coaching.</li>
+        <li><strong>How we measure it</strong> — next-step booked rate, follow-up quality, deal progression, and conversion over time.</li>
+      </ul>
+
+      <h3>2. Claims readiness</h3>
+      <p>
+        This would be for insurance claims analysts who need to decide whether a claim is ready to approve, reject, or escalate. Before the analyst moves the claim forward, the product would check whether key evidence is missing, whether the facts are consistent, and whether the claim matches known escalation rules.
+      </p>
+      <ul>
+        <li><strong>Where it sits</strong> — after the analyst drafts their assessment, before approval or escalation.</li>
+        <li><strong>What it improves</strong> — missing documents, inconsistent reasoning, incorrect escalations, and rework from senior reviewers.</li>
+        <li><strong>How we measure it</strong> — claim handling time, rework rate, escalation accuracy, and quality audit outcomes.</li>
+      </ul>
+
+      <h3>3. Customer support readiness</h3>
+      <p>
+        This would be for support agents who need to send accurate, helpful replies under time pressure. Before a response goes to the customer, the product would check whether the answer is complete, whether the tone is right, whether policy has been followed, and whether the ticket should be escalated instead.
+      </p>
+      <ul>
+        <li><strong>Where it sits</strong> — after the agent drafts a response, before it is sent to the customer.</li>
+        <li><strong>What it improves</strong> — incomplete replies, poor tone, policy mistakes, missed escalation signals, and repeat contacts.</li>
+        <li><strong>How we measure it</strong> — first-contact resolution, response time, CSAT, escalation rate, and reopen rate.</li>
+      </ul>
+
+      <h2>After 6 months: expand to roles where this flow naturally fits</h2>
+      <p>
+        By this point, the product should not just be a PR tool with a few copies. It should become a repeatable adoption pattern for knowledge work. The right expansion areas are roles where work is reviewed often, quality standards are knowable, and the business already feels the cost of rework.
+      </p>
+
+      <h3>4. Finance report readiness</h3>
+      <p>
+        Finance analysts spend a lot of time preparing monthly reporting packs for managers and executives. A readiness check could review the commentary before it reaches the finance manager: are the variances explained clearly, are the drivers named, are the numbers consistent with the narrative, and are obvious executive questions answered?
+      </p>
+      <ul>
+        <li><strong>Where it sits</strong> — before a monthly report or board pack goes to review.</li>
+        <li><strong>What it improves</strong> — unclear commentary, missing business drivers, inconsistent numbers, and repeated manager edits.</li>
+        <li><strong>How we measure it</strong> — reporting turnaround time, number of review cycles, corrections needed, and time saved during close.</li>
+      </ul>
+
+      <h3>5. Consulting deliverable readiness</h3>
+      <p>
+        Consultants and associates often prepare client updates, analysis packs, or recommendations that need manager or partner review before they go to the client. A readiness check could flag weak recommendations, missing evidence, unclear structure, and places where the client&apos;s actual question has not been answered.
+      </p>
+      <ul>
+        <li><strong>Where it sits</strong> — before a draft client deliverable goes to a manager or partner.</li>
+        <li><strong>What it improves</strong> — vague recommendations, weak evidence, poor structure, and partner review time.</li>
+        <li><strong>How we measure it</strong> — time to client-ready version, number of review rounds, partner edits, and delivery speed.</li>
+      </ul>
+
+      <h3>6. RFP and proposal readiness</h3>
+      <p>
+        Bid teams, sales engineers, and consultants spend hours preparing proposal responses. A readiness check could review the draft before submission and ask whether every requirement has been answered, whether the proof points are strong enough, and whether the response sounds consistent across sections.
+      </p>
+      <ul>
+        <li><strong>Where it sits</strong> — after a proposal draft is assembled, before final review and submission.</li>
+        <li><strong>What it improves</strong> — unanswered requirements, inconsistent language, weak proof points, and slow proposal review.</li>
+        <li><strong>How we measure it</strong> — proposal turnaround time, compliance score, review effort, and eventually win rate.</li>
+      </ul>
+
+      <h3>7. Product spec readiness</h3>
+      <p>
+        Product managers write specs and tickets that engineers then have to interpret. A readiness check could review a PRD or ticket before engineering review and flag unclear requirements, missing edge cases, weak acceptance criteria, or decisions that still need to be made.
+      </p>
+      <ul>
+        <li><strong>Where it sits</strong> — before a product spec or ticket goes to engineering.</li>
+        <li><strong>What it improves</strong> — unclear requirements, missing edge cases, repeated clarification, and delayed build starts.</li>
+        <li><strong>How we measure it</strong> — clarification cycles, rework, time from spec to build start, and engineering satisfaction.</li>
+      </ul>
+
+      <h3>8. Audit workpaper readiness</h3>
+      <p>
+        Audit associates prepare workpapers that seniors and managers review before sign-off. A readiness check could flag missing evidence, unsupported conclusions, unclear rationale, or places where the workpaper does not match the audit program.
+      </p>
+      <ul>
+        <li><strong>Where it sits</strong> — before a workpaper is submitted to the senior reviewer.</li>
+        <li><strong>What it improves</strong> — review notes, missing evidence, unsupported conclusions, and rework before sign-off.</li>
+        <li><strong>How we measure it</strong> — review-note volume, time to sign-off, rework rate, and audit quality findings.</li>
+      </ul>
+
+      <h2>After 12 months: move beyond Readiness</h2>
+      <p>
+        At 12 months, I would not want Chico to be boxed in as a readiness product. Readiness is the wedge because it gives us a clean first motion: check the work before review. But the bigger category is AI adoption tools for specific roles and workflows.
+      </p>
+      <p>
+        The question becomes: for each role inside a client company, where can AI make a recurring workflow faster, better, or cheaper? Sometimes the answer will be a readiness check. Sometimes it will be a summary, a draft, a triage tool, a recommendation, a coach, a search layer, or a decision-support tool.
+      </p>
+
+      <h3>How I would define the next opportunities</h3>
+      <p>
+        I would use a simple filter. First, find workflows that happen every week. Second, find the painful part of that workflow: time lost, quality variance, missed follow-up, compliance risk, or manager review burden. Third, decide what kind of AI help fits that moment. Fourth, measure adoption inside the workflow, not through generic AI usage. Fifth, connect the workflow metric to ROI.
+      </p>
+      <p>
+        That is the shift: Chico stops asking “are employees using AI?” and starts asking “which role-level workflows are improving because AI is embedded inside them?”
+      </p>
+
+      <h3>Examples in financial services</h3>
+      <p>
+        A relationship manager could use AI to prepare for client meetings by pulling together CRM notes, recent emails, portfolio changes, and market context. Adoption would be measured by how often meeting briefs are generated and used before client calls. ROI would be measured through prep time saved, follow-up completion, client engagement, and pipeline movement.
+      </p>
+      <p>
+        A compliance analyst could use AI to triage policy exceptions, summarise the relevant rules, and suggest the likely next step. Adoption would be measured by the percentage of cases where AI triage is used. ROI would be measured through faster case handling, better escalation accuracy, and reduced manual review effort.
+      </p>
+
+      <h3>Examples in retail</h3>
+      <p>
+        A merchandiser could use AI to analyse product performance, stock levels, seasonality, and margin pressure, then suggest actions for the next buying or replenishment decision. Adoption would be measured by how often planners use AI recommendations before decisions. ROI would be measured through fewer stockouts, lower markdowns, and better margin.
+      </p>
+      <p>
+        A store manager could use AI to turn daily sales, staffing, inventory, and customer feedback into a practical action plan for the day. Adoption would be measured by daily plan usage and task completion. ROI would be measured through labour efficiency, sales uplift, shrink reduction, and fewer missed operational issues.
+      </p>
+
+      <h3>Examples in healthcare</h3>
+      <p>
+        A care coordinator could use AI to summarise patient history, open referrals, outstanding tasks, and next actions before a follow-up. Adoption would be measured by how often coordinators use the summary before working a case. ROI would be measured through time saved per case, fewer missed follow-ups, and faster coordination.
+      </p>
+      <p>
+        A revenue cycle team could use AI to classify denied claims, suggest appeal reasons, and prioritise the highest-value recoveries. Adoption would be measured by the percentage of denials handled through the AI-assisted workflow. ROI would be measured through appeal turnaround time, denial recovery rate, and recovered revenue.
+      </p>
+
+      <h3>Examples in professional services</h3>
+      <p>
+        A consultant could use AI to turn research, interview notes, and client context into a first draft of a client deliverable. Adoption would be measured by how often teams use AI to create first drafts or structured outlines. ROI would be measured through time to first draft, review cycles, project margin, and speed to client-ready output.
+      </p>
+      <p>
+        An engagement manager could use AI to monitor project health by summarising meeting notes, risks, blockers, scope changes, and next steps across the project. Adoption would be measured by weekly use of AI-generated project health summaries. ROI would be measured through fewer missed risks, reduced project slippage, and better team utilisation.
+      </p>
+
+      <h2>What changes by industry</h2>
+      <p>
+        The engine can stay the same, but the rubric cannot. A readiness product only works if it understands what “good” means in that company&apos;s context. That is where Chico&apos;s role-level adoption thesis becomes important.
+      </p>
+      <ul>
+        <li><strong>In financial services</strong>, readiness might mean checking risk language, regulatory references, audit trails, and approval controls.</li>
+        <li><strong>In professional services</strong>, readiness might mean checking client framing, evidence quality, scope alignment, and whether the recommendation is strong enough.</li>
+        <li><strong>In retail</strong>, readiness might mean checking margin assumptions, vendor terms, seasonality, inventory risk, and whether the commercial logic is clear.</li>
+        <li><strong>In healthcare</strong>, readiness might mean checking privacy guardrails, evidence quality, payer requirements, and whether the work follows the right clinical or operational pathway.</li>
       </ul>
 
       <h2>What stays the same</h2>
       <p>
-        Whatever the artifact and whatever the segment, the motion is the same: <em>produce, score, suggest, accept or fix, ship</em>. The AI lead at each company shapes the rubric and the suggestion bank; chico.ai runs the loop. The screen looks different for a pre-call brief than for a pull request, but the engine underneath does not change.
+        In the first phase, the product motion stays simple: create the work, run the readiness check, fix the obvious gaps, and send a cleaner version to the reviewer. The user gets faster feedback. The reviewer gets better work. The manager gets a measurable story about quality and speed.
       </p>
       <p>
-        That's the path from a single prototype to a category.
+        In the second phase, the pattern gets broader. Chico becomes the layer that helps companies find the right AI workflow for each role, launch it where the work already happens, and measure whether it actually improves the business.
+      </p>
+      <p>
+        That is how this scales from one GitHub prototype into something larger. PR Readiness is the wedge. Role-level AI adoption is the product bet.
       </p>
     </>
   );

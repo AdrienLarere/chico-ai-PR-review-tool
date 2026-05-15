@@ -459,14 +459,6 @@ code, pre, .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
     0 0 24px -2px rgba(79, 184, 155, 0.35),
     inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
 }
-/* fixed — white glow */
-.suggestion-card.fixed {
-  border: 1px solid rgba(255, 255, 255, 0.55) !important;
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.35),
-    0 0 24px -2px rgba(240, 237, 247, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.10) !important;
-}
 /* declined — red glow */
 .suggestion-card.declined {
   border: 1px solid rgba(217, 107, 122, 0.6) !important;
@@ -555,6 +547,171 @@ code, pre, .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
 .prose a:hover,
 .prose-link:hover { color: var(--accent-hover); }
 
+
+/* Thumbs feedback — green/red glow on the button itself (not the card) */
+.btn.thumb-up-active {
+  border: 1px solid rgba(79, 184, 155, 0.65) !important;
+  color: #87D6BC !important;
+  box-shadow:
+    0 0 0 1px rgba(79, 184, 155, 0.35),
+    0 0 18px -2px rgba(79, 184, 155, 0.45) !important;
+}
+.btn.thumb-down-active {
+  border: 1px solid rgba(217, 107, 122, 0.65) !important;
+  color: #E69AA5 !important;
+  box-shadow:
+    0 0 0 1px rgba(217, 107, 122, 0.35),
+    0 0 18px -2px rgba(217, 107, 122, 0.45) !important;
+}
+
+/* Save button — white card, accent text */
+.btn-save {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #FFFFFF;
+  color: var(--accent);
+  border: 1px solid rgba(107, 107, 255, 0.28);
+  padding: 9px 18px;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow:
+    -2px -2px 6px rgba(var(--pillow-shadow-light), 0.85),
+    2px 2px 8px rgba(var(--pillow-shadow-dark), 0.5);
+  transition: all 200ms ease-out;
+}
+.btn-save:hover {
+  color: var(--accent-hover);
+  box-shadow:
+    -3px -3px 8px rgba(var(--pillow-shadow-light), 0.9),
+    3px 3px 10px rgba(var(--pillow-shadow-dark), 0.55);
+}
+
+/* Editable code view — textarea + gutter */
+.dev-code-edit {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: var(--text-1);
+  padding: 18px 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+}
+.dev-code-edit .code-gutter {
+  display: flex;
+  flex-direction: column;
+}
+.dev-code-edit .code-line-num {
+  position: relative;
+  width: 70px;
+  height: calc(13.5px * 1.75);
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 0 10px 0 0;
+  color: var(--text-3);
+  font-size: 11.5px;
+  user-select: none;
+  font-variant-numeric: tabular-nums;
+}
+.dev-code-edit .code-line-num .line-marker {
+  position: absolute;
+  left: 4px;
+  top: 2px;
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  background: var(--accent);
+  color: white;
+  font-family: 'Geist', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 10px -2px rgba(107, 107, 255, 0.4);
+}
+.dev-code-edit .code-editor {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: var(--text-1);
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0 18px 0 0;
+  margin: 0;
+  width: 100%;
+  resize: none;
+  white-space: pre;
+  overflow: hidden;
+  caret-color: var(--accent);
+  tab-size: 2;
+}
+.dev-code-edit .code-editor:focus { outline: none; }
+
+/* Editable description (PR description field) */
+.desc-editor {
+  font-family: 'Geist', 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text-1);
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 18px 22px;
+  width: 100%;
+  resize: none;
+  caret-color: var(--accent);
+}
+
+/* NPS modal scale buttons */
+.nps-scale {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+.nps-scale-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.nps-pill {
+  padding: 9px 6px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(180, 170, 230, 0.18);
+  color: var(--dtext-2);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 180ms ease-out;
+  text-align: center;
+}
+.nps-pill:hover {
+  color: var(--dtext-1);
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(180, 170, 230, 0.32);
+}
+.nps-pill.selected {
+  background: rgba(107, 107, 255, 0.28);
+  border-color: rgba(107, 107, 255, 0.55);
+  color: #E4E3FF;
+  box-shadow: 0 0 16px -4px rgba(107, 107, 255, 0.5);
+}
+
+/* Admin page hero tile grid */
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+}
+@media (max-width: 1280px) {
+  .admin-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 820px) {
+  .admin-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.admin-tile { min-height: 168px; }
 
 /* chico bear navbar icon — gentle float */
 .chico-bear {

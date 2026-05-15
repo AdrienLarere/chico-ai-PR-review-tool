@@ -8,7 +8,7 @@ const PageQueue = ({ ctx }) => {
 
   // Build list, applying the live score for #184
   const prs = window.PRS.map(p => p.id === 184 ? { ...p, score: ctx.pr184.score, readiness: window.readinessFromScore(ctx.pr184.score),
-    accepted: Object.values(ctx.pr184.actions).filter(v => v === 'accepted' || v === 'fixed').length,
+    accepted: Object.values(ctx.pr184.actions).filter(v => v === 'accepted').length,
     declined: Object.values(ctx.pr184.actions).filter(v => v === 'declined').length,
     ignored: 5 - Object.keys(ctx.pr184.actions).length,
   } : p);
