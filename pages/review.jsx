@@ -283,7 +283,23 @@ function NPSModal({ pr, onCancel, onSubmit }) {
   return (
     <div className="modal-backdrop" onClick={onCancel}>
       <div className="glass p-24 bounce-in" style={{ maxWidth: 680, width: '100%', maxHeight: '88vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
-        <div className="t-12 glass-text-3 uppercase mb-8">Quick feedback</div>
+        {/* Success banner — make it unambiguous the review is already in flight */}
+        <div className="row gap-10 mb-16" style={{
+          padding: '12px 14px',
+          borderRadius: 12,
+          background: 'rgba(79,184,155,0.15)',
+          border: '1px solid rgba(79,184,155,0.35)',
+        }}>
+          <div className="row center" style={{ width: 28, height: 28, borderRadius: 9, background: 'rgba(79,184,155,0.28)', color: '#87D6BC', flex: '0 0 auto' }}>
+            <Icon name="check" className="ic ic-sm" />
+          </div>
+          <div className="flex-1">
+            <div className="t-14 w-600 glass-text-1" style={{ lineHeight: 1.3 }}>Review request submitted</div>
+            <div className="t-12 glass-text-2 mt-2" style={{ lineHeight: 1.45 }}>Reviewers on {pr.team} have been notified. You're done — the questions below are optional.</div>
+          </div>
+        </div>
+
+        <div className="t-12 glass-text-3 uppercase mb-8">Quick feedback (optional)</div>
         <div className="t-20 glass-text-1">How was your experience?</div>
         <div className="t-12 glass-text-3 mt-4">Three short questions. Skip any of them — submitting always works.</div>
 
@@ -538,24 +554,23 @@ const PageReview = ({ ctx, prId }) => {
   };
 
   // ---- Request review (with NPS trigger for PR 176) ----
+  // The review request fires immediately on click — the NPS modal that follows
+  // for PR #176 is an optional follow-up, not a gate.
   const requestReview = () => {
     if (reviewRequested) return;
-    if (id === 176) {
-      setShowNPS(true);
-    } else {
-      setReviewRequested(true);
-      ctx.pushToast('Human review requested', `Reviewers on ${pr.team} have been notified.`);
-    }
+    setReviewRequested(true);
+    ctx.pushToast('Human review requested', `Reviewers on ${pr.team} have been notified.`);
+    if (id === 176) setShowNPS(true);
   };
   const submitNPS = ({ text, answers }) => {
     setShowNPS(false);
-    setReviewRequested(true);
-    ctx.pushToast('Thanks for the feedback', `Review requested. ${Object.keys(answers).length} answer${Object.keys(answers).length === 1 ? '' : 's'} logged.`);
+    const n = Object.keys(answers).length;
+    if (n > 0 || text.trim()) {
+      ctx.pushToast('Thanks for the feedback', `${n} answer${n === 1 ? '' : 's'} logged.`);
+    }
   };
   const skipNPS = () => {
     setShowNPS(false);
-    setReviewRequested(true);
-    ctx.pushToast('Human review requested', `Reviewers on ${pr.team} have been notified.`);
   };
 
   // Suggestions for active file (with synthetic statuses for non-interactive PRs)
